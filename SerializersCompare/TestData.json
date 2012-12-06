@@ -1,0 +1,45 @@
+{
+  "ApiVer": 1,
+  "ReqHdr": {
+    "UserId": "c47a8dce-1476-45c6-83fd-abb36929bc8f",
+    "MktId": "b914ed0f-3eae-4935-ae09-a6e8d7c839cb",
+    "InstnId": "3a67830d-e1c9-4ec2-b283-8f1e0ab653b1",
+    "SvcLevel": 3,
+    "Timestamp": "2012-06-06T00:39:30.9204097Z"
+  },
+  "TuneInput": {
+    "Portfolios": [
+      {
+        "PfHeader": {
+          "PfNum": 1,
+          "TargetRisk": 0.14,
+          "TargetRet": 0.11,
+          "TimeLastTune": "2012-06-06T00:39:30.9204097Z"
+        },
+        "Positions":[
+               {
+                  "Sym":"GOOG",
+                  "Desc":"Gewgle !!",
+                  "Qty":10,
+                  "MktVal":1,
+                  "Currency":"USD"
+               },
+               {
+                  "Sym":"IBM",
+                  "Desc":"",
+                  "Qty":20,
+                  "MktVal":1,
+                  "Currency":"USD"
+               }
+            ],
+            "Constraints":[
+               {
+                  "AssetClass":"EM",
+                  "Operator":"LT",
+                  "LimitVal":"0.20"
+               }
+            ]
+         }
+      ]
+   }
+}
