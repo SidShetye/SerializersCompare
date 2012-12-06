@@ -10,15 +10,80 @@ namespace TestSerializers
 {
     class Program
     {
+        public static List<Results> results;
+        public static Test test = new Test();
+
+
         static void Main(string[] args)
         {
-            Test test = new Test();
-            test.LoadEntityObject();
-            test.RunTests();
+            bool stillWorking = true;
+            char menuOption = 'T';
 
-            System.Console.Write(Environment.NewLine);
-            System.Console.WriteLine("Press any key to exit ...");
-            System.Console.ReadLine();
+            while (stillWorking)
+            {
+                switch (menuOption)
+                {
+                    case 'T':
+                        test.LoadEntityObject();
+                        results = test.RunTests();
+                        test.PrintResultTable(results);
+                        break;
+                    case 'E':
+                        stillWorking = false;
+                        break;
+                    case 'D':
+                        Console.WriteLine("Type the name of the serializer to print:");
+                        string serName = Console.ReadLine();
+                        printTestObject(serName);
+                        break;
+                    case 'R':
+                        test.PrintResultTable(results);
+                        break;
+                    default:
+                        Console.WriteLine("Unknown input!");
+                        break;
+                }
+
+                if (stillWorking)
+                {
+                    printMenu();
+                    menuOption = getUserSelection();
+                }
+            }
+        }
+
+        static void printMenu()
+        {
+            Console.WriteLine("Options: (T)est, (R)esults, (D)eserializer output, (E)xit");
+        }
+
+        static char getUserSelection()
+        {
+            char menuOption = 'T';
+
+            //ConsoleKeyInfo cki = Console.ReadKey();
+            //string inputStr = cki.KeyChar.ToString().ToUpper().Replace(" ", string.Empty);
+            string inputStr = Console.ReadLine();
+            inputStr = inputStr.ToUpper().Replace(" ", string.Empty);
+            if (inputStr.Length > 0)
+                menuOption = inputStr[0];
+            else
+                menuOption = '~'; // char not in selection 
+
+            return menuOption;
+        }
+
+        static void printTestObject(string serName)
+        {
+            Results resultsThisSer = results.Find(a => a.serName == serName);
+            if (resultsThisSer != null)
+            {
+                Console.WriteLine(resultsThisSer.serializedFormObject);
+            }
+            else
+            {
+                Console.WriteLine("Incorrect serializer name!");
+            }
         }
     }
 }

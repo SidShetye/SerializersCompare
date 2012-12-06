@@ -43,6 +43,9 @@
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.602\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.29\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -55,6 +58,8 @@
   <ItemGroup>
     <Compile Include="Results.cs" />
     <Compile Include="Serializers\BinFormatter.cs" />
+    <Compile Include="Serializers\ServiceStackJson.cs" />
+    <Compile Include="Serializers\ServiceStackJsv.cs" />
     <Compile Include="Serializers\ITestSerializers.cs" />
     <Compile Include="Serializers\ProtoBuf.cs" />
     <Compile Include="Test.cs" />

@@ -18,12 +18,18 @@ namespace TestSerializers
             testObject = new SimpleEntity();
         }
 
-        public void RunTests()
+        public List<Results> RunTests()
         {
             int loopLimit = 10000;
             List<Results> resultTable = new List<Results>();
-            // JSON test
+            // Json.NET test
             resultTable.Add(TestSerializerInLoop(new JsonNET(), loopLimit));
+
+            // ServiceStackTextJsv test
+            resultTable.Add(TestSerializerInLoop(new ServiceStackJsv(), loopLimit));
+
+            // ServiceStackTextJson test
+            resultTable.Add(TestSerializerInLoop(new ServiceStackJson(), loopLimit));
 
             // BinaryFormatter test
             resultTable.Add(TestSerializerInLoop(new BinFormatter(), loopLimit));
@@ -31,12 +37,10 @@ namespace TestSerializers
             // ProtoBuf test
             resultTable.Add(TestSerializerInLoop(new ProtoBuf(), loopLimit));
 
-            PrintResultTable(resultTable);
-
-            return;
+            return resultTable;
         }
 
-        private void PrintResultTable(List<Results> resultTable)
+        public void PrintResultTable(List<Results> resultTable)
         {
             // Stores as lists top-down but console printing is left to right!
             // This is inherently ugly, can be fixed if so desired
@@ -83,6 +87,9 @@ namespace TestSerializers
                 }
                 System.Console.Write(Environment.NewLine);
             }
+
+            System.Console.WriteLine("If the above looks messy, please set your console width to over 200 and rerun this program");
+
         }
 
         private Results TestSerializerInLoop(dynamic ser, int loopLimit)
@@ -92,23 +99,43 @@ namespace TestSerializers
             Results result = new Results();
             result.serName = ser.GetName();
 
-
+            int sizeInBytes;
+            bool success;
+            string testObjJson;
+            int i = 1;
             result.resultColumn = new List<ResultColumnEntry>();
-            for (int i = 1; i <= loopLimit; i = i * 2)
+            do
             {
-                int sizeInBytes;
-                bool success;
                 // test at this loop count
-                ResultColumnEntry resultEntry = TestSerializer(ser, i, out sizeInBytes, out success);
+                ResultColumnEntry resultEntry = TestSerializer(ser, i, out sizeInBytes, out success, out testObjJson);
                 result.resultColumn.Add(resultEntry);
-                result.sizeBytes = sizeInBytes;
-                result.success = success;
-            }
+                i = i * 2;
+            } while (i <= loopLimit);
+
+            result.sizeBytes = sizeInBytes;
+            result.success = success;
+            result.testObjectAsJson = testObjJson; // for debug
+            result.serializedFormObject = PrintSerializedOutput(ser); // for debug
 
             return result;
         }
 
-        private ResultColumnEntry TestSerializer(dynamic ser, int iterations, out int sizeInBytes, out bool success)
+        private string PrintSerializedOutput(dynamic ser)
+        {
+            string strOutput;
+            if (ser.IsBinary())
+            {
+                byte[] binOutput = ser.Serialize(originalObject);
+                strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
+            }
+            else
+            {
+                strOutput = ser.Serialize(originalObject);
+            }
+            return strOutput;
+        }
+
+        private ResultColumnEntry TestSerializer(dynamic ser, int iterations, out int sizeInBytes, out bool success, out string testObjJson)
         {
             Stopwatch sw = new Stopwatch();
             
@@ -155,7 +182,7 @@ namespace TestSerializers
             if (avgTicks == 0)
             {
                 // sometime when running windows inside a VM this is 0! Possible vm issue?
-                Debugger.Break();
+                //Debugger.Break();
             }
             entry.time = new TimeSpan(avgTicks);
 
@@ -164,14 +191,15 @@ namespace TestSerializers
             JsonNET jsonSer = new JsonNET();
 
             string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(originalObject));
-            string testObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(testObject));
+            
+            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize(testObject));
             success = true;
-            if (orignalObjectAsJson != testObjectAsJson)
+            if (orignalObjectAsJson != testObjJson)
             {
                 System.Console.WriteLine(">>>> {0} FAILED <<<<", ser.GetName());
                 System.Console.WriteLine("\tOriginal and regenerated objects differ !!");
                 System.Console.WriteLine("\tRegenerated objects is:");
-                System.Console.WriteLine(testObjectAsJson);
+                System.Console.WriteLine(testObjJson);
                 success = false;
             }
 
