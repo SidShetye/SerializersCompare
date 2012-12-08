@@ -18,14 +18,14 @@ namespace TestSerializers
             return false;
         }
 
-        public dynamic Serialize(object thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             return TypeSerializer.SerializeToString(thisObj);
         }
 
-        public T Deserialize<T>(dynamic json)
+        public T Deserialize<T>(dynamic jsv)
         {
-            return TypeSerializer.DeserializeFromString<T>((string)json);
+            return TypeSerializer.DeserializeFromString<T>((string)jsv);
         }
     }
 }

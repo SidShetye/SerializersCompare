@@ -24,9 +24,7 @@ namespace TestSerializers
                 switch (menuOption)
                 {
                     case 'T':
-                        test.LoadEntityObject();
-                        results = test.RunTests();
-                        test.PrintResultTable(results);
+                        RunTests();
                         break;
                     case 'E':
                         stillWorking = false;
@@ -84,6 +82,18 @@ namespace TestSerializers
             {
                 Console.WriteLine("Incorrect serializer name!");
             }
+        }
+
+        static void RunTests()
+        {
+            // Pick an entity type
+            SimpleEntity originalObject = new SimpleEntity();
+            originalObject.FillDummyData();
+            SimpleEntity testObject = new SimpleEntity();
+            
+            results = test.RunTests<SimpleEntity>(originalObject, testObject);
+            
+            test.PrintResultTable(results);
         }
     }
 }

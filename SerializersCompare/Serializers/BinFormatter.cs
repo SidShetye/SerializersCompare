@@ -19,7 +19,7 @@ namespace TestSerializers
             return true;
         }
 
-        public dynamic Serialize(object thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             using (MemoryStream ms = new MemoryStream())
             {

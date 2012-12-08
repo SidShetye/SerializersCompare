@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 using ProtoBuf;
+using System.Xml.Serialization;
 
 namespace TestSerializers
 {
+    [XmlInclude(typeof(SimpleEntity))]
     [Serializable]
     [DataContract]
-    class SimpleEntity
+    public class SimpleEntity
     {
         [DataMember(Order = 1)]
         public string message { get; set; }
-        
+
         [DataMember(Order = 2)]
         public string functionCall {get;set;}
 

@@ -18,7 +18,7 @@ namespace TestSerializers
             return false;
         }
 
-        public dynamic Serialize(object thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             return JsonConvert.SerializeObject(thisObj);
         }

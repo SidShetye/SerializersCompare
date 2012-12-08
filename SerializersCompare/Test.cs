@@ -9,33 +9,33 @@ namespace TestSerializers
 {
     class Test
     {
-        private SimpleEntity originalObject;
-        private SimpleEntity testObject;
-        public void LoadEntityObject()
-        {
-            originalObject = new SimpleEntity();
-            originalObject.FillDummyData();
-            testObject = new SimpleEntity();
-        }
+        private object originalObject;
+        private object testObject;
 
-        public List<Results> RunTests()
+        public List<Results> RunTests<T>(T originalObj, T testObj)
         {
+            originalObject = originalObj;
+            testObject = testObj;
+
             int loopLimit = 10000;
             List<Results> resultTable = new List<Results>();
             // Json.NET test
-            resultTable.Add(TestSerializerInLoop(new JsonNET(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNET(), loopLimit));
 
             // ServiceStackTextJsv test
-            resultTable.Add(TestSerializerInLoop(new ServiceStackJsv(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv(), loopLimit));
 
             // ServiceStackTextJson test
-            resultTable.Add(TestSerializerInLoop(new ServiceStackJson(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson(), loopLimit));
+
+            // .NET XML serializer
+            resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet(), loopLimit));
 
             // BinaryFormatter test
-            resultTable.Add(TestSerializerInLoop(new BinFormatter(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter(), loopLimit));
 
             // ProtoBuf test
-            resultTable.Add(TestSerializerInLoop(new ProtoBuf(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ProtoBuf(), loopLimit));
 
             return resultTable;
         }
@@ -92,50 +92,49 @@ namespace TestSerializers
 
         }
 
-        private Results TestSerializerInLoop(dynamic ser, int loopLimit)
+        private Results TestSerializerInLoop<T>(dynamic ser, int loopLimit)
         {
-            
-            // geometrically scale at x2
-            Results result = new Results();
-            result.serName = ser.GetName();
-
             int sizeInBytes;
             bool success;
             string testObjJson;
             int i = 1;
+            Results result = new Results();
+            List<object> warmUpObjects = new List<object>();
+            
+            result.serName = ser.GetName();
             result.resultColumn = new List<ResultColumnEntry>();
             do
             {
                 // test at this loop count
-                ResultColumnEntry resultEntry = TestSerializer(ser, i, out sizeInBytes, out success, out testObjJson);
+                ResultColumnEntry resultEntry = TestSerializer<T>(ser, i, out sizeInBytes, out success, out testObjJson);
                 result.resultColumn.Add(resultEntry);
-                i = i * 2;
+                i = i * 2;    // geometrically scale loop at x2
             } while (i <= loopLimit);
 
             result.sizeBytes = sizeInBytes;
             result.success = success;
             result.testObjectAsJson = testObjJson; // for debug
-            result.serializedFormObject = PrintSerializedOutput(ser); // for debug
+            result.serializedFormObject = PrintSerializedOutput<T>(ser); // for debug
 
             return result;
         }
 
-        private string PrintSerializedOutput(dynamic ser)
+        private string PrintSerializedOutput<T>(dynamic ser)
         {
             string strOutput;
             if (ser.IsBinary())
             {
-                byte[] binOutput = ser.Serialize(originalObject);
+                byte[] binOutput = ser.Serialize<T>(originalObject);
                 strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
             }
             else
             {
-                strOutput = ser.Serialize(originalObject);
+                strOutput = ser.Serialize<T>(originalObject);
             }
             return strOutput;
         }
 
-        private ResultColumnEntry TestSerializer(dynamic ser, int iterations, out int sizeInBytes, out bool success, out string testObjJson)
+        private ResultColumnEntry TestSerializer<T>(dynamic ser, int iterations, out int sizeInBytes, out bool success, out string testObjJson)
         {
             Stopwatch sw = new Stopwatch();
             
@@ -148,12 +147,12 @@ namespace TestSerializers
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    binOutput = ser.Serialize(originalObject);
-                    testObject = ser.Deserialize<SimpleEntity>(binOutput);
+                    binOutput = ser.Serialize<T>(originalObject);
+                    testObject = ser.Deserialize<T>(binOutput);
                 }
                 sw.Stop();
                 // Find size outside loop to avoid timing hits
-                binOutput = ser.Serialize(originalObject);
+                binOutput = ser.Serialize<T>(originalObject);
                 sizeInBytes = binOutput.Count();
             }
             // TEXT serializers
@@ -165,15 +164,15 @@ namespace TestSerializers
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    strOutput = ser.Serialize(originalObject);
-                    testObject = ser.Deserialize<SimpleEntity>(strOutput);
+                    strOutput = ser.Serialize<T>(originalObject);
+                    testObject = ser.Deserialize<T>(strOutput);
                 }
                 sw.Stop();
 
                 // Find size outside loop to avoid timing hits
                 // Size as bytes for UTF-8 as it's most common on internet
                 System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-                byte[] strInBytes = encoding.GetBytes(ser.Serialize(originalObject));
+                byte[] strInBytes = encoding.GetBytes(ser.Serialize<T>(originalObject));
                 sizeInBytes = strInBytes.Count();
             }
             ResultColumnEntry entry = new ResultColumnEntry();
@@ -190,9 +189,9 @@ namespace TestSerializers
             // Debug: To aid printing to screen, human debugging etc. Json used as best for console presentation
             JsonNET jsonSer = new JsonNET();
 
-            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(originalObject));
+            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(originalObject));
             
-            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize(testObject));
+            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(testObject));
             success = true;
             if (orignalObjectAsJson != testObjJson)
             {

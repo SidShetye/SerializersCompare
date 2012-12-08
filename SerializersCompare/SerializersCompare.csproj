@@ -62,6 +62,7 @@
     <Compile Include="Serializers\ServiceStackJsv.cs" />
     <Compile Include="Serializers\ITestSerializers.cs" />
     <Compile Include="Serializers\ProtoBuf.cs" />
+    <Compile Include="Serializers\XmlSerialization.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Utils\JsonPrettyPrint.cs" />
     <Compile Include="Program.cs" />
