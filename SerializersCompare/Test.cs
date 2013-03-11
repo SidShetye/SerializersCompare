@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SerializersCompare.Serializers;
+using SerializersCompare.Utils;
 
-namespace TestSerializers
+namespace SerializersCompare
 {
     class Test
     {
@@ -35,7 +35,7 @@ namespace TestSerializers
             resultTable.Add(TestSerializerInLoop<T>(new BinFormatter(), loopLimit));
 
             // ProtoBuf test
-            resultTable.Add(TestSerializerInLoop<T>(new ProtoBuf(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new Serializers.ProtoBuf(), loopLimit));
 
             return resultTable;
         }

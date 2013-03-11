@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ServiceStack.Text;
+﻿using ServiceStack.Text;
 
-namespace TestSerializers
+namespace SerializersCompare.Serializers
 {
     public class ServiceStackJson : ITestSerializers
     {

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace TestSerializers
+namespace SerializersCompare.Serializers
 {
     public class BinFormatter : ITestSerializers
     {

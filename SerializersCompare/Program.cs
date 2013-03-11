@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.IO;
-using Newtonsoft.Json;
+using SerializersCompare.Entities;
 
-namespace TestSerializers
+namespace SerializersCompare
 {
     class Program
     {
-        public static List<Results> results;
-        public static Test test = new Test();
+        public static List<Results> Results;
+        public static Test Test = new Test();
 
 
         static void Main(string[] args)
@@ -32,10 +28,10 @@ namespace TestSerializers
                     case 'D':
                         Console.WriteLine("Type the name of the serializer to print:");
                         string serName = Console.ReadLine();
-                        printTestObject(serName);
+                        PrintTestObject(serName);
                         break;
                     case 'R':
-                        test.PrintResultTable(results);
+                        Test.PrintResultTable(Results);
                         break;
                     default:
                         Console.WriteLine("Unknown input!");
@@ -44,36 +40,36 @@ namespace TestSerializers
 
                 if (stillWorking)
                 {
-                    printMenu();
-                    menuOption = getUserSelection();
+                    PrintMenu();
+                    menuOption = GetUserSelection();
                 }
             }
         }
 
-        static void printMenu()
+        static void PrintMenu()
         {
             Console.WriteLine("Options: (T)est, (R)esults, (D)eserializer output, (E)xit");
         }
 
-        static char getUserSelection()
+        static char GetUserSelection()
         {
-            char menuOption = 'T';
+            char menuOption = '~'; // some char not in selection 
 
             //ConsoleKeyInfo cki = Console.ReadKey();
             //string inputStr = cki.KeyChar.ToString().ToUpper().Replace(" ", string.Empty);
             string inputStr = Console.ReadLine();
-            inputStr = inputStr.ToUpper().Replace(" ", string.Empty);
-            if (inputStr.Length > 0)
-                menuOption = inputStr[0];
-            else
-                menuOption = '~'; // char not in selection 
-
+            if (inputStr != null)
+            {
+                inputStr = inputStr.ToUpper().Replace(" ", string.Empty);
+                if (inputStr.Length > 0)
+                    menuOption = inputStr[0];                    
+            }
             return menuOption;
         }
 
-        static void printTestObject(string serName)
+        static void PrintTestObject(string serName)
         {
-            Results resultsThisSer = results.Find(a => a.serName == serName);
+            Results resultsThisSer = Results.Find(a => a.serName == serName);
             if (resultsThisSer != null)
             {
                 Console.WriteLine(resultsThisSer.serializedFormObject);
@@ -87,13 +83,13 @@ namespace TestSerializers
         static void RunTests()
         {
             // Pick an entity type
-            SimpleEntity originalObject = new SimpleEntity();
+            var originalObject = new InheritedEntity();
             originalObject.FillDummyData();
-            SimpleEntity testObject = new SimpleEntity();
+            var testObject = new InheritedEntity();
             
-            results = test.RunTests<SimpleEntity>(originalObject, testObject);
+            Results = Test.RunTests(originalObject, testObject);
             
-            test.PrintResultTable(results);
+            Test.PrintResultTable(Results);
         }
     }
 }
