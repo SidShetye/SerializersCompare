@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerializersCompare", "SerializersCompare\SerializersCompare.csproj", "{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8FCD2B14-28CE-4F28-AE22-0A71A6C80439}"
@@ -10,22 +12,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8FCD2B
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickTestProtoBuf", "QuickTestProtoBuf\QuickTestProtoBuf.csproj", "{EEE2835E-ADD8-44BE-BE55-D327E69FFF7F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CoreOnly|Any CPU = CoreOnly|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		iOS|Any CPU = iOS|Any CPU
+		Net20|Any CPU = Net20|Any CPU
+		Profile|Any CPU = Profile|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Silverlight2|Any CPU = Silverlight2|Any CPU
+		Unity|Any CPU = Unity|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.CoreOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.CoreOnly|Any CPU.Build.0 = Release|Any CPU
 		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.iOS|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.iOS|Any CPU.Build.0 = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Net20|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Net20|Any CPU.Build.0 = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Profile|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Profile|Any CPU.Build.0 = Release|Any CPU
 		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEE2835E-ADD8-44BE-BE55-D327E69FFF7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEE2835E-ADD8-44BE-BE55-D327E69FFF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEE2835E-ADD8-44BE-BE55-D327E69FFF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEE2835E-ADD8-44BE-BE55-D327E69FFF7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Silverlight2|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Silverlight2|Any CPU.Build.0 = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Unity|Any CPU.ActiveCfg = Release|Any CPU
+		{A279AA6E-F18F-4D46-AB8E-2394D9C754B7}.Unity|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
