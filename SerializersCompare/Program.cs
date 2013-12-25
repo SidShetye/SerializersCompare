@@ -32,6 +32,10 @@ namespace SerializersCompare
                     case 'R':
                         Test.PrintResultTable(Results);
                         break;
+                    case 'X':
+                        var expt = new Experiments();
+                        expt.RunExpt1();
+                        break;
                     default:
                         Console.WriteLine("Unknown input!");
                         break;

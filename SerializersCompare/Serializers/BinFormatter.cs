@@ -15,7 +15,7 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(T thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             using (MemoryStream ms = new MemoryStream())
             {

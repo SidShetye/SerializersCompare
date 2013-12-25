@@ -16,7 +16,7 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(T thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             var ms = new MemoryStream();
             using (var writer = new BsonWriter(ms))

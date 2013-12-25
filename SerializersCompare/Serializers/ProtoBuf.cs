@@ -15,9 +15,9 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(T thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 Serializer.NonGeneric.Serialize(ms, thisObj);
                 return ms.ToArray();
@@ -27,7 +27,7 @@ namespace SerializersCompare.Serializers
         public T Deserialize<T>(dynamic bytes)
         {
 
-            using (MemoryStream ms = new MemoryStream((byte[])bytes))
+            using (var ms = new MemoryStream((byte[])bytes))
             {
                 return Serializer.Deserialize<T>(ms);
             }

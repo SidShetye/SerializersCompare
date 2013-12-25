@@ -17,19 +17,28 @@ namespace SerializersCompare
             _originalObject = originalObj;
             _testObject = testObj;
 
-            const int loopLimit = 100;
+            const int loopLimit = 1000;
             var resultTable = new List<Results>();
 
-            ////MessagePack
-            // This works but is 1000x slower (no cold-start caching/warm start concept in library?)
-            // so commenting out for faster results. Uncomment line below for full test
-            //resultTable.Add(TestSerializerInLoop<T>(new MessagePack(), loopLimit));
-            
-            // Json.NET test
-            resultTable.Add(TestSerializerInLoop<T>(new JsonNET(), loopLimit));
+            // BINARY SERIALIZERS
+            // ProtoBuf test
+            resultTable.Add(TestSerializerInLoop<T>(new Serializers.ProtoBuf(), loopLimit));
+
+            // Avro test
+            resultTable.Add(TestSerializerInLoop<T>(new Avro(), loopLimit));
+
+            //MessagePack
+            resultTable.Add(TestSerializerInLoop<T>(new MessagePack(), loopLimit));
 
             // Json.NET.BSON test
             resultTable.Add(TestSerializerInLoop<T>(new JsonNETBSON(), loopLimit));
+
+            // BinaryFormatter test
+            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter(), loopLimit));
+            
+            // TEXT SERIALIZERS
+            // Json.NET test
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNET(), loopLimit));
 
             // ServiceStackTextJson test
             resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson(), loopLimit));
@@ -39,12 +48,6 @@ namespace SerializersCompare
 
             // .NET XML serializer
             resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet(), loopLimit));
-
-            // BinaryFormatter test
-            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter(), loopLimit));
-
-            // ProtoBuf test
-            resultTable.Add(TestSerializerInLoop<T>(new Serializers.ProtoBuf(), loopLimit));
 
             return resultTable;
         }
@@ -133,12 +136,12 @@ namespace SerializersCompare
             string strOutput;
             if (ser.IsBinary())
             {
-                byte[] binOutput = ser.Serialize(_originalObject);
+                byte[] binOutput = ser.Serialize<T>(_originalObject);
                 strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
             }
             else
             {
-                strOutput = ser.Serialize(_originalObject);
+                strOutput = ser.Serialize<T>(_originalObject);
             }
             return strOutput;
         }
@@ -156,32 +159,31 @@ namespace SerializersCompare
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    binOutput = ser.Serialize(_originalObject);
+                    binOutput = ser.Serialize<T>(_originalObject);
                     _testObject = ser.Deserialize<T>(binOutput);
                 }
                 sw.Stop();
                 // Find size outside loop to avoid timing hits
-                binOutput = ser.Serialize(_originalObject);
+                binOutput = ser.Serialize<T>(_originalObject);
                 sizeInBytes = binOutput.Count();
             }
             // TEXT serializers
             // eg. JSON, XML etc
             else 
             {
-                string strOutput;
                 sw.Reset();
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    strOutput = ser.Serialize(_originalObject);
+                    string strOutput = ser.Serialize<T>(_originalObject);
                     _testObject = ser.Deserialize<T>(strOutput);
                 }
                 sw.Stop();
 
                 // Find size outside loop to avoid timing hits
                 // Size as bytes for UTF-8 as it's most common on internet
-                System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-                byte[] strInBytes = encoding.GetBytes(ser.Serialize(_originalObject));
+                var encoding = new System.Text.UTF8Encoding();
+                byte[] strInBytes = encoding.GetBytes(ser.Serialize<T>(_originalObject));
                 sizeInBytes = strInBytes.Count();
             }
             var entry = new ResultColumnEntry();
@@ -198,9 +200,9 @@ namespace SerializersCompare
             // Debug: To aid printing to screen, human debugging etc. Json used as best for console presentation
             var jsonSer = new JsonNET();
 
-            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(_originalObject));
+            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(_originalObject));
             
-            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize(_testObject));
+            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(_testObject));
             success = true;
             if (orignalObjectAsJson != testObjJson)
             {

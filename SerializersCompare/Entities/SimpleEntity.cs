@@ -6,7 +6,7 @@ using ProtoBuf;
 namespace SerializersCompare.Entities
 {
     [Serializable]
-    [DataContract]
+    [DataContract(Name = "SimpleEntity", Namespace = "com.GitHub.SerializersCompare.Entities")]
     [ProtoInclude(100, typeof(InheritedEntity))]
     public class SimpleEntity
     {

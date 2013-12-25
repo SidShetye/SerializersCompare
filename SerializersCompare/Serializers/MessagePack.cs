@@ -19,15 +19,13 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        // API usage per http://irisclasson.com/2012/12/17/serializing-and-deserializing-packingunpacking-to-a-file-andor-memorystream-with-messagepack-in-c/
-
-        public dynamic Serialize<T>(T thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             var serializer = MessagePackSerializer.Create<T>();
 
             using (var byteStream = new MemoryStream())
             {
-                serializer.Pack(byteStream, thisObj);
+                serializer.Pack(byteStream, (T)thisObj);
                 return byteStream.ToArray();
             }
         }

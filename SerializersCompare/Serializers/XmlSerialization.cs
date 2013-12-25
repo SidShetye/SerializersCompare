@@ -16,7 +16,7 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(T thisObj)
+        public dynamic Serialize<T>(object thisObj)
         {
             MemoryStream ms = new MemoryStream();
             XmlSerializer xmlSer = new XmlSerializer(thisObj.GetType());
