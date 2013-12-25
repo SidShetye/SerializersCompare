@@ -16,10 +16,10 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public dynamic Serialize<T>(T thisObj)
         {
             MemoryStream ms = new MemoryStream();
-            XmlSerializer xmlSer = new XmlSerializer(typeof(T));
+            XmlSerializer xmlSer = new XmlSerializer(thisObj.GetType());
             xmlSer.Serialize(ms, thisObj);
             ms.Seek(0, SeekOrigin.Begin);
 

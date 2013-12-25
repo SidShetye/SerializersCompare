@@ -9,24 +9,33 @@ namespace SerializersCompare
 {
     class Test
     {
-        private object originalObject;
-        private object testObject;
+        private object _originalObject;
+        private object _testObject;
 
         public List<Results> RunTests<T>(T originalObj, T testObj)
         {
-            originalObject = originalObj;
-            testObject = testObj;
+            _originalObject = originalObj;
+            _testObject = testObj;
 
-            int loopLimit = 10000;
-            List<Results> resultTable = new List<Results>();
+            const int loopLimit = 100;
+            var resultTable = new List<Results>();
+
+            ////MessagePack
+            // This works but is 1000x slower (no cold-start caching/warm start concept in library?)
+            // so commenting out for faster results. Uncomment line below for full test
+            //resultTable.Add(TestSerializerInLoop<T>(new MessagePack(), loopLimit));
+            
             // Json.NET test
             resultTable.Add(TestSerializerInLoop<T>(new JsonNET(), loopLimit));
 
-            // ServiceStackTextJsv test
-            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv(), loopLimit));
+            // Json.NET.BSON test
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNETBSON(), loopLimit));
 
             // ServiceStackTextJson test
             resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson(), loopLimit));
+
+            // ServiceStackTextJsv test
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv(), loopLimit));
 
             // .NET XML serializer
             resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet(), loopLimit));
@@ -44,32 +53,32 @@ namespace SerializersCompare
         {
             // Stores as lists top-down but console printing is left to right!
             // This is inherently ugly, can be fixed if so desired
-            int col1 = 5;
-            int colN = 20;
+            const int col1 = 5;
+            const int colN = 20;
 
             // Header - line 1
             string formatString = String.Format("{{0,{0}}}", col1);
             string toPrint = "";
-            System.Console.Write(formatString, toPrint);
+            Console.Write(formatString, toPrint);
             for (int i = 0; i < resultTable.Count; i++)
             {
                 toPrint = String.Format("{0}", resultTable[i].serName);
                 formatString = String.Format("{{0,{0}}}", colN );
-                System.Console.Write(formatString, toPrint);
+                Console.Write(formatString, toPrint);
             }
-            System.Console.Write(Environment.NewLine);
+            Console.Write(Environment.NewLine);
 
             // Header - line 2
             formatString = String.Format("{{0,{0}}}", col1);
             toPrint = "Loop";
-            System.Console.Write(formatString, toPrint);
+            Console.Write(formatString, toPrint);
             for (int i = 0; i < resultTable.Count; i++)
             {
                 toPrint = String.Format("Size:{0} bytes", resultTable[i].sizeBytes);
                 formatString = String.Format("{{0,{0}}}", colN );
-                System.Console.Write(formatString, toPrint);
+                Console.Write(formatString, toPrint);
             }
-            System.Console.Write(Environment.NewLine);
+            Console.Write(Environment.NewLine);
 
             // Rest of Table
             //Assumes: all colums have same length and rows line-up for same loop count
@@ -77,18 +86,18 @@ namespace SerializersCompare
             {
                 formatString = String.Format("{{0,{0}}}", col1);
                 toPrint = resultTable[0].resultColumn[row].iteration.ToString();
-                System.Console.Write(formatString, toPrint);
+                Console.Write(formatString, toPrint);
 
                 for (int i = 0; i < resultTable.Count; i++)
                 {
                     formatString = String.Format("{{0,{0}}}", colN );
                     toPrint = String.Format("{0,4:n4} ms", resultTable[i].resultColumn[row].time.TotalMilliseconds);
-                    System.Console.Write(formatString, toPrint);
+                    Console.Write(formatString, toPrint);
                 }
-                System.Console.Write(Environment.NewLine);
+                Console.Write(Environment.NewLine);
             }
 
-            System.Console.WriteLine("If the above looks messy, please set your console width to over 200 and rerun this program");
+            Console.WriteLine("If the above looks messy, please set your console width to over 200 and rerun this program");
 
         }
 
@@ -98,8 +107,8 @@ namespace SerializersCompare
             bool success;
             string testObjJson;
             int i = 1;
-            Results result = new Results();
-            List<object> warmUpObjects = new List<object>();
+            var result = new Results();
+            var warmUpObjects = new List<object>();
             
             result.serName = ser.GetName();
             result.resultColumn = new List<ResultColumnEntry>();
@@ -124,12 +133,12 @@ namespace SerializersCompare
             string strOutput;
             if (ser.IsBinary())
             {
-                byte[] binOutput = ser.Serialize<T>(originalObject);
+                byte[] binOutput = ser.Serialize(_originalObject);
                 strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
             }
             else
             {
-                strOutput = ser.Serialize<T>(originalObject);
+                strOutput = ser.Serialize(_originalObject);
             }
             return strOutput;
         }
@@ -147,12 +156,12 @@ namespace SerializersCompare
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    binOutput = ser.Serialize<T>(originalObject);
-                    testObject = ser.Deserialize<T>(binOutput);
+                    binOutput = ser.Serialize(_originalObject);
+                    _testObject = ser.Deserialize<T>(binOutput);
                 }
                 sw.Stop();
                 // Find size outside loop to avoid timing hits
-                binOutput = ser.Serialize<T>(originalObject);
+                binOutput = ser.Serialize(_originalObject);
                 sizeInBytes = binOutput.Count();
             }
             // TEXT serializers
@@ -164,18 +173,18 @@ namespace SerializersCompare
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    strOutput = ser.Serialize<T>(originalObject);
-                    testObject = ser.Deserialize<T>(strOutput);
+                    strOutput = ser.Serialize(_originalObject);
+                    _testObject = ser.Deserialize<T>(strOutput);
                 }
                 sw.Stop();
 
                 // Find size outside loop to avoid timing hits
                 // Size as bytes for UTF-8 as it's most common on internet
                 System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-                byte[] strInBytes = encoding.GetBytes(ser.Serialize<T>(originalObject));
+                byte[] strInBytes = encoding.GetBytes(ser.Serialize(_originalObject));
                 sizeInBytes = strInBytes.Count();
             }
-            ResultColumnEntry entry = new ResultColumnEntry();
+            var entry = new ResultColumnEntry();
             entry.iteration = iterations;
             long avgTicks = sw.Elapsed.Ticks / iterations;
             if (avgTicks == 0)
@@ -187,18 +196,18 @@ namespace SerializersCompare
 
 
             // Debug: To aid printing to screen, human debugging etc. Json used as best for console presentation
-            JsonNET jsonSer = new JsonNET();
+            var jsonSer = new JsonNET();
 
-            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(originalObject));
+            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(_originalObject));
             
-            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(testObject));
+            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize(_testObject));
             success = true;
             if (orignalObjectAsJson != testObjJson)
             {
-                System.Console.WriteLine(">>>> {0} FAILED <<<<", ser.GetName());
-                System.Console.WriteLine("\tOriginal and regenerated objects differ !!");
-                System.Console.WriteLine("\tRegenerated objects is:");
-                System.Console.WriteLine(testObjJson);
+                Console.WriteLine(">>>> {0} FAILED <<<<", ser.GetName());
+                Console.WriteLine("\tOriginal and regenerated objects differ !!");
+                Console.WriteLine("\tRegenerated objects is:");
+                Console.WriteLine(testObjJson);
                 success = false;
             }
 

@@ -9,7 +9,6 @@ namespace SerializersCompare
         public static List<Results> Results;
         public static Test Test = new Test();
 
-
         static void Main(string[] args)
         {
             bool stillWorking = true;

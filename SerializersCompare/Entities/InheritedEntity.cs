@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
-using System.Xml.Serialization;
 
 namespace SerializersCompare.Entities
 {
-    [XmlInclude(typeof(InheritedEntity))]
     [Serializable]
     [DataContract]
     public class InheritedEntity : SimpleEntity

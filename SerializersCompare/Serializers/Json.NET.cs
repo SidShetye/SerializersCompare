@@ -14,7 +14,7 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public dynamic Serialize<T>(T thisObj)
         {
             return JsonConvert.SerializeObject(thisObj);
         }

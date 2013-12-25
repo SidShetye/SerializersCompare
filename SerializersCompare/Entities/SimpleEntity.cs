@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
-using System.Xml.Serialization;
+using ProtoBuf;
 
 namespace SerializersCompare.Entities
 {
-    [XmlInclude(typeof(SimpleEntity))]
     [Serializable]
     [DataContract]
+    [ProtoInclude(100, typeof(InheritedEntity))]
     public class SimpleEntity
     {
         [DataMember(Order = 10)]
