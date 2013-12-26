@@ -17,7 +17,7 @@ namespace SerializersCompare
             _originalObject = originalObj;
             _testObject = testObj;
 
-            const int loopLimit = 100;
+            const int loopLimit = 10000;
             var resultTable = new List<Results>();
 
             // BINARY SERIALIZERS
