@@ -4,7 +4,7 @@ using System.IO;
 
 namespace SerializersCompare.Serializers
 {
-    public class XmlDotNet : ITestSerializers
+    public class XmlDotNet<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -16,27 +16,35 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
         {
-            MemoryStream ms = new MemoryStream();
-            XmlSerializer xmlSer = new XmlSerializer(thisObj.GetType());
-            xmlSer.Serialize(ms, thisObj);
-            ms.Seek(0, SeekOrigin.Begin);
 
-            StreamReader reader = new StreamReader(ms, Encoding.UTF8);
-            string outString = reader.ReadToEnd();
-
-            return outString;
         }
 
-        public T Deserialize<T>(dynamic xml)
+        public dynamic Serialize(object thisObj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var xmlSer = new XmlSerializer(thisObj.GetType());
+                xmlSer.Serialize(ms, thisObj);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                var reader = new StreamReader(ms, Encoding.UTF8);
+                string outString = reader.ReadToEnd();
+
+                return outString;
+            }
+        }
+
+        public T Deserialize(dynamic xml)
         {
             byte[] byteArray = Encoding.UTF8.GetBytes((string)xml);
-            MemoryStream ms = new MemoryStream(byteArray);
-            ms.Seek(0, SeekOrigin.Begin);
-
-            XmlSerializer xmlSer = new XmlSerializer(typeof(T));
-            return (T)xmlSer.Deserialize(ms);
+            using (var ms = new MemoryStream(byteArray))
+            {
+                ms.Seek(0, SeekOrigin.Begin);
+                var xmlSer = new XmlSerializer(typeof (T));
+                return (T) xmlSer.Deserialize(ms);
+            }
         }
     }
 }

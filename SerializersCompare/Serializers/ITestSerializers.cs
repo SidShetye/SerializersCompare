@@ -1,11 +1,14 @@
 ﻿namespace SerializersCompare.Serializers
 {
-    public interface ITestSerializers
+    public interface ITestSerializers<T>
     {
         string GetName();
         bool IsBinary();
-        dynamic Serialize<T>(object thisObj); // Most serializers don't need the <T> generic
+
+        void Init();
+
+        dynamic Serialize(object thisObj); // Most serializers don't need the <T> generic
                                               // but few DO (eg .NET XML).
-        T Deserialize<T>(dynamic serInput);
+        T Deserialize(dynamic serInput);
     }
 }

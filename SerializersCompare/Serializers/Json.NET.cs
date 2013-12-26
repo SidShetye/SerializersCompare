@@ -2,7 +2,7 @@
 
 namespace SerializersCompare.Serializers
 {
-    public class JsonNET : ITestSerializers
+    public class JsonNet<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -14,12 +14,18 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
+        {
+
+        }
+
+
+        public dynamic Serialize(object thisObj)
         {
             return JsonConvert.SerializeObject(thisObj);
         }
 
-        public T Deserialize<T>(dynamic json)
+        public T Deserialize(dynamic json)
         {
             return JsonConvert.DeserializeObject<T>((string)json);
         }

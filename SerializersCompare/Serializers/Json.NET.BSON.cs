@@ -4,7 +4,7 @@ using Newtonsoft.Json.Bson;
 
 namespace SerializersCompare.Serializers
 {
-    public class JsonNETBSON : ITestSerializers
+    public class JsonNetBson<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -16,21 +16,25 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
         {
-            var ms = new MemoryStream();
+
+        }
+
+        public dynamic Serialize(object thisObj)
+        {
+            using (var ms = new MemoryStream())
             using (var writer = new BsonWriter(ms))
             {
                 var serializer = new JsonSerializer();
                 serializer.Serialize(writer, thisObj);
+                return ms.ToArray();
             }
-
-            return ms.ToArray();
         }
 
-        public T Deserialize<T>(dynamic bson)
+        public T Deserialize(dynamic bson)
         {
-            var ms = new MemoryStream(bson);
+            using (var ms = new MemoryStream(bson))
             using (var reader = new BsonReader(ms))
             {
               var serializer = new JsonSerializer();            

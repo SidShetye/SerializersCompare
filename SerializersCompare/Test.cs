@@ -12,42 +12,45 @@ namespace SerializersCompare
         private object _originalObject;
         private object _testObject;
 
-        public List<Results> RunTests<T>(T originalObj, T testObj)
+        public List<Results> RunTests<T>(T originalObj, T testObj) where T : new()
         {
             _originalObject = originalObj;
             _testObject = testObj;
 
-            const int loopLimit = 1000;
+            const int loopLimit = 100;
             var resultTable = new List<Results>();
 
             // BINARY SERIALIZERS
             // ProtoBuf test
-            resultTable.Add(TestSerializerInLoop<T>(new Serializers.ProtoBuf(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ProtoBuf<T>(), loopLimit));
 
             // Avro test
-            resultTable.Add(TestSerializerInLoop<T>(new Avro(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new Avro<T>(), loopLimit));
+
+            // Avro test
+            resultTable.Add(TestSerializerInLoop<T>(new Thrift<T>(), loopLimit));
 
             //MessagePack
-            resultTable.Add(TestSerializerInLoop<T>(new MessagePack(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new MessagePack<T>(), loopLimit));
 
             // Json.NET.BSON test
-            resultTable.Add(TestSerializerInLoop<T>(new JsonNETBSON(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNetBson<T>(), loopLimit));
 
             // BinaryFormatter test
-            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter<T>(), loopLimit));
             
             // TEXT SERIALIZERS
             // Json.NET test
-            resultTable.Add(TestSerializerInLoop<T>(new JsonNET(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNet<T>(), loopLimit));
 
             // ServiceStackTextJson test
-            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson<T>(), loopLimit));
 
             // ServiceStackTextJsv test
-            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv<T>(), loopLimit));
 
             // .NET XML serializer
-            resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet<T>(), loopLimit));
 
             return resultTable;
         }
@@ -136,12 +139,12 @@ namespace SerializersCompare
             string strOutput;
             if (ser.IsBinary())
             {
-                byte[] binOutput = ser.Serialize<T>(_originalObject);
+                byte[] binOutput = ser.Serialize(_originalObject);
                 strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
             }
             else
             {
-                strOutput = ser.Serialize<T>(_originalObject);
+                strOutput = ser.Serialize(_originalObject);
             }
             return strOutput;
         }
@@ -159,12 +162,12 @@ namespace SerializersCompare
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    binOutput = ser.Serialize<T>(_originalObject);
-                    _testObject = ser.Deserialize<T>(binOutput);
+                    binOutput = ser.Serialize(_originalObject);
+                    _testObject = ser.Deserialize(binOutput);
                 }
                 sw.Stop();
                 // Find size outside loop to avoid timing hits
-                binOutput = ser.Serialize<T>(_originalObject);
+                binOutput = ser.Serialize(_originalObject);
                 sizeInBytes = binOutput.Count();
             }
             // TEXT serializers
@@ -175,15 +178,15 @@ namespace SerializersCompare
                 sw.Start();
                 for (int i = 0; i < iterations; i++)
                 {
-                    string strOutput = ser.Serialize<T>(_originalObject);
-                    _testObject = ser.Deserialize<T>(strOutput);
+                    string strOutput = ser.Serialize(_originalObject);
+                    _testObject = ser.Deserialize(strOutput);
                 }
                 sw.Stop();
 
                 // Find size outside loop to avoid timing hits
                 // Size as bytes for UTF-8 as it's most common on internet
                 var encoding = new System.Text.UTF8Encoding();
-                byte[] strInBytes = encoding.GetBytes(ser.Serialize<T>(_originalObject));
+                byte[] strInBytes = encoding.GetBytes(ser.Serialize(_originalObject));
                 sizeInBytes = strInBytes.Count();
             }
             var entry = new ResultColumnEntry();
@@ -198,11 +201,11 @@ namespace SerializersCompare
 
 
             // Debug: To aid printing to screen, human debugging etc. Json used as best for console presentation
-            var jsonSer = new JsonNET();
+            var jsonSer = new JsonNet<T>();
 
-            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(_originalObject));
+            string orignalObjectAsJson = JsonHelper.FormatJson(jsonSer.Serialize(_originalObject));
             
-            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize<T>(_testObject));
+            testObjJson = JsonHelper.FormatJson(jsonSer.Serialize(_testObject));
             success = true;
             if (orignalObjectAsJson != testObjJson)
             {

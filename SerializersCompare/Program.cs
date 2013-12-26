@@ -33,7 +33,8 @@ namespace SerializersCompare
                         Test.PrintResultTable(Results);
                         break;
                     case 'X':
-                        var expt = new Experiments();
+                        //var expt = new Experiments.ThriftClientServerExpt();
+                        var expt = new Experiments.ThriftSerialization();
                         expt.RunExpt1();
                         break;
                     default:
@@ -86,8 +87,10 @@ namespace SerializersCompare
         static void RunTests()
         {
             // Pick an entity type
+            //var originalObject = new SimpleEntity();
             var originalObject = new InheritedEntity();
             originalObject.FillDummyData();
+            //var testObject = new SimpleEntity();
             var testObject = new InheritedEntity();
             
             Results = Test.RunTests(originalObject, testObject);

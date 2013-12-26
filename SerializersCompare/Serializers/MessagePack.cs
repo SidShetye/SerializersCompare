@@ -1,13 +1,9 @@
 ﻿using System.IO;
-using System.Runtime.CompilerServices;
 using MsgPack.Serialization;
-using Newtonsoft.Json;
-using MsgPack;
-using System;
 
 namespace SerializersCompare.Serializers
 {
-    public class MessagePack : ITestSerializers
+    public class MessagePack<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -19,7 +15,12 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
+        {
+
+        }
+
+        public dynamic Serialize(object thisObj)
         {
             var serializer = MessagePackSerializer.Create<T>();
 
@@ -30,7 +31,7 @@ namespace SerializersCompare.Serializers
             }
         }
 
-        public T Deserialize<T>(dynamic bytes)
+        public T Deserialize(dynamic bytes)
         {
             var serializer = MessagePackSerializer.Create<T>();
             using (var byteStream = new MemoryStream(bytes))

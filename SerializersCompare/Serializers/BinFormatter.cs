@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SerializersCompare.Serializers
 {
-    public class BinFormatter : ITestSerializers
+    public class BinFormatter<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -15,21 +15,26 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
         {
-            using (MemoryStream ms = new MemoryStream())
+
+        }
+
+        public dynamic Serialize(object thisObj)
+        {
+            using (var ms = new MemoryStream())
             {
-                BinaryFormatter bf = new BinaryFormatter(); 
+                var bf = new BinaryFormatter(); 
                 bf.Serialize(ms, thisObj);
                 return ms.GetBuffer();
             }
         }
 
-        public T Deserialize<T>(dynamic bytes)
+        public T Deserialize(dynamic bytes)
         {
-            using (MemoryStream ms = new MemoryStream((byte[])bytes))
+            using (var ms = new MemoryStream((byte[])bytes))
             {
-                BinaryFormatter bf = new BinaryFormatter();
+                var bf = new BinaryFormatter();
                 ms.Read(bytes, 0, 0);
                 return (T)bf.Deserialize(ms);
             }

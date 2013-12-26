@@ -53,5 +53,4 @@ namespace SerializersCompare.Entities
             rng.GetBytes(Icon);
         }
     }
-
 }

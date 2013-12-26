@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SerializersCompare.Serializers
 {
-    public class ProtoBuf : ITestSerializers
+    public class ProtoBuf<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -15,7 +15,12 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
+        {
+
+        }
+
+        public dynamic Serialize(object thisObj)
         {
             using (var ms = new MemoryStream())
             {
@@ -24,7 +29,7 @@ namespace SerializersCompare.Serializers
             }
         }
 
-        public T Deserialize<T>(dynamic bytes)
+        public T Deserialize(dynamic bytes)
         {
 
             using (var ms = new MemoryStream((byte[])bytes))

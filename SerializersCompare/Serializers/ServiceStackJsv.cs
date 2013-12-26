@@ -2,7 +2,7 @@
 
 namespace SerializersCompare.Serializers
 {
-    public class ServiceStackJsv : ITestSerializers
+    public class ServiceStackJsv<T> : ITestSerializers<T>
     {
         public string GetName()
         {
@@ -14,12 +14,18 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public dynamic Serialize<T>(object thisObj)
+        public void Init()
+        {
+
+        }
+
+
+        public dynamic Serialize(object thisObj)
         {
             return TypeSerializer.SerializeToString(thisObj);
         }
 
-        public T Deserialize<T>(dynamic jsv)
+        public T Deserialize(dynamic jsv)
         {
             return TypeSerializer.DeserializeFromString<T>((string)jsv);
         }
