@@ -1,6 +1,6 @@
 SerializersCompare
 ==================
-Showcasing a few C# text and binary serializers for performance and size. Feel free to modify and improve.
+Showcasing a few C# text and binary serializers for performance and size. Similar in concept (but not internal design) to https://github.com/eishay/jvm-serializers/wiki but for C# instead of Java. Feel free to improve and send your pull request to me.
 
 Results
 -------
@@ -26,10 +26,8 @@ Results
 
 Notes
 -----
-1. The `cheating` tags above simply mean that Unlike most serializers, Thrift and Avro code-gen their own data classes and those, not the application's existing classes are used in transport and RPC. So most real world projects will certainly bear some extra processing time taken to copy values from their internal app logic classes into the Thrift auto-gen'd classes. In other serializers one can directly use the app logic classes, bypassing the extra copy needed by Thrift. So "Cheating" simply means whether or not we should exclude the data-copy times from Thrift's timings. Real world performance should be with cheating disabled.
-
-2. The efficiency of the chosen injection/projection library is worth questioning. We're using ValueInjecter for now, perhaps AutoMapper is quicker?
+The `cheating` tags above simply mean that unlike most serializers, Thrift and Avro code-gen their own data classes and those, not the application's existing classes, are used in transport and RPC. Most real world projects will therefore see extra processing time to copy values from their internal app logic classes into the Thrift/Avro auto-gen'd classes. In contrast, most other serializers (including Avro MSFT) use the app logic classes directly, bypassing the extra copy into the code-gen'd classes. So "cheating" simply means discarding that extra copy time. For real world performance indicators, you should look at figures WITHOUT cheating.
 
 Issues
 ------
-1. Need to see why Avro MSFT is larger than the standard Avro. Avro MSFT uses the inherited C# objects and doesn't have any pre-compilation, code generation phase i.e. it likely computes the schema at run time. Avro standard on the other hand, uses separately created (by hand) non-inherited Avro schema and the tool does code-generation off that schema. So it's very likely that the MSFT generated schema has the heirarchy actually seen in the inherited object and that takes more bytes.
+Need to see why Avro MSFT is larger than the standard Avro. Avro MSFT uses the inherited C# objects and doesn't have any pre-compilation, code generation phase i.e. it likely computes the schema at run time. Avro standard on the other hand, uses separately created (by hand) non-inherited Avro schema and the tool does code-generation off that schema. So it's very likely that the MSFT generated schema has the hierarchy actually seen in the inherited object and that takes more bytes since it likely encapsulates structures within structures. It should be easy to match the lower byte count if one manually wrote a class without inheritence to match the hand-written schema.
