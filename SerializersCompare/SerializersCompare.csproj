@@ -40,6 +40,9 @@
     <Reference Include="Avro">
       <HintPath>..\lib\avro-1.7.5\main\Release\Avro.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Hadoop.Avro">
       <HintPath>..\packages\Microsoft.Hadoop.Avro.0.8.4951.5418\lib\net40\Microsoft.Hadoop.Avro.dll</HintPath>
     </Reference>
@@ -76,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\InheritedEntity.cs" />
+    <Compile Include="Experiments\Asn1Experiments.cs" />
     <Compile Include="Experiments\AvroExpt.cs" />
     <Compile Include="Experiments\ExptDummy.cs" />
     <Compile Include="Experiments\ThriftClientServerExpt.cs" />

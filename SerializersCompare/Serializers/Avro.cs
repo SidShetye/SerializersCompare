@@ -6,7 +6,7 @@ namespace SerializersCompare.Serializers
 {
     public class Avro<T> : CodeGenSersBase<T, InheritedEntityAvro> where T : new()
     {
-        public Avro(bool enableCheating = false): base(enableCheating)
+        public Avro(bool cheating = false): base(cheating)
         {
             IsBinarySerializer = true;
             SerName = "Avro";
@@ -14,8 +14,7 @@ namespace SerializersCompare.Serializers
 
         public override dynamic Serialize(object thisObj)
         {
-            if (CodeGenObjSer == null || !EnableCheating)
-                CodeGenObjSer = ToSerObject((T)thisObj);
+            DoCopyIfNotCheating((T)thisObj);
 
             using (var ms = new MemoryStream())
             {
@@ -34,11 +33,8 @@ namespace SerializersCompare.Serializers
             {
                 var dec = new BinaryDecoder(ms);
                 var reader = new SpecificDefaultReader(InheritedEntityAvro._SCHEMA, InheritedEntityAvro._SCHEMA);
-                var regenAvroMsg = new InheritedEntityAvro();
-                reader.Read(regenAvroMsg, dec); //TODO: reuse the regenAvroMsg object?
-
-                if (RegenAppObj == null || !EnableCheating)
-                    RegenAppObj = FromSerObject(regenAvroMsg);
+                reader.Read(ReuseDeserObj, dec);
+                DoCopyIfNotCheating(ReuseDeserObj);
 
                 return RegenAppObj;
             }

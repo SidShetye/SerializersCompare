@@ -7,6 +7,7 @@ namespace SerializersCompare.Serializers
     public class AvroMsft<T> : SerializerBase<T>
     {
         private bool _schemaSaved = false;
+        private AvroSerializer serializer;
 
         public AvroMsft()
         {
@@ -14,6 +15,7 @@ namespace SerializersCompare.Serializers
             // C# world (uses DataContract decorators)
             SerName = "Avro MSFT";
             IsBinarySerializer = true;
+            serializer = new AvroSerializer(typeof(T));
         }
 
         // Note, this can be made faster if we generate the schema file (.avsc)
@@ -22,10 +24,7 @@ namespace SerializersCompare.Serializers
         // doesn't support an init() or codegen() phase (yet!)
         public override dynamic Serialize(object thisObj)
         {
-            var serializer = new AvroSerializer(thisObj.GetType());
-
-            SaveSchema(serializer);
-
+            SaveSchema();
             using (var ms = new MemoryStream())
             {
                 serializer.Serialize(thisObj, ms);
@@ -36,15 +35,13 @@ namespace SerializersCompare.Serializers
 
         public override T Deserialize(dynamic bytes)
         {
-            var serializer = new AvroSerializer(typeof(T));
-
             using (var ms = new MemoryStream((byte[])bytes))
             {
                 return serializer.Deserialize<T>(ms);
             }
         }
 
-        private void SaveSchema(AvroSerializer serializer)
+        private void SaveSchema()
         {
             if (_schemaSaved)
                 return;

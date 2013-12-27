@@ -45,7 +45,7 @@ namespace SerializersCompare.Entities
             Name = "Mr John Doe";
             EmployeeId = 1;
             RaiseRate = 1.2F;
-            AddressLine1 = "5775 Morehouse Dr";
+            AddressLine1 = "123 Main St";
             AddressLine2 = "San Diego, CA";
 
             Icon = new byte[16];

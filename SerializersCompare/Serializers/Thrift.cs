@@ -8,8 +8,8 @@ namespace SerializersCompare.Serializers
 {
     public class Thrift<T> : CodeGenSersBase<T, InheritedEntityThrift> where T : new()
     {
-        public Thrift(bool enableCheating = false)
-            : base(enableCheating)
+        public Thrift(bool cheating = false)
+            : base(cheating)
         {
             IsBinarySerializer = true;
             SerName = "Thrift";
@@ -17,16 +17,16 @@ namespace SerializersCompare.Serializers
 
         public override dynamic Serialize(object thisObj)
         {
-            if (CodeGenObjSer == null || !EnableCheating)
-                CodeGenObjSer = ToSerObject((T)thisObj);
+            DoCopyIfNotCheating((T)thisObj);
 
             using (var ms = new MemoryStream())
             {
                 var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
                 CodeGenObjSer.Write(tproto);
                 SerBytes = ms.ToArray();
-                return SerBytes;
             }
+
+            return SerBytes;
         }
 
         public override T Deserialize(dynamic bytes)
@@ -34,13 +34,11 @@ namespace SerializersCompare.Serializers
             using (var ms = new MemoryStream(bytes))
             {
                 var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
-                var regenTMsg = new InheritedEntityThrift();
-                regenTMsg.Read(tproto);
-                if (RegenAppObj == null || !EnableCheating)
-                    RegenAppObj = FromSerObject(regenTMsg);
-
-                return RegenAppObj;
+                ReuseDeserObj.Read(tproto);
+                DoCopyIfNotCheating(ReuseDeserObj);
             }
+
+            return RegenAppObj;
         }
 
         protected override T FromSerObject(InheritedEntityThrift regenTMsg)

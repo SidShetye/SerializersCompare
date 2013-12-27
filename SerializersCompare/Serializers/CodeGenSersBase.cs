@@ -8,6 +8,7 @@ namespace SerializersCompare.Serializers
     {
         protected U CodeGenObjSer;
         protected T RegenAppObj;
+        protected U ReuseDeserObj;
 
         /// <summary>
         /// Unlike other serializers, Thrift code-gens it's own data classes and those, not the 
@@ -23,31 +24,52 @@ namespace SerializersCompare.Serializers
         /// Note: The efficiency of the chosen injection/projection library is worth 
         /// questioning. We're using ValueInjecter for now, perhaps AutoMapper is quicker?
         /// </summary>
-        protected bool EnableCheating;
+        protected bool Cheating;
 
-        public CodeGenSersBase(bool enableCheating = false)
+        protected bool SerCopyDone = false;
+        protected bool DeserCopyDone = false;
+
+        protected CodeGenSersBase(bool cheating = false)
         {
-            EnableCheating = enableCheating;
+            Cheating = cheating;
+            RegenAppObj = new T();
+            CodeGenObjSer = new U();
+            ReuseDeserObj = new U();
         }
 
         public new virtual string Name()
         {
-            if (EnableCheating)
+            if (Cheating)
                 SerName += " (cheating)";
             return SerName;
         }
 
+        protected void DoCopyIfNotCheating(T thisObj)
+        {
+            if (!SerCopyDone || !Cheating)
+            {
+                CodeGenObjSer = ToSerObject(thisObj);
+                SerCopyDone = true;
+            }
+        }
+
+        protected void DoCopyIfNotCheating(U regenTMsg)
+        {
+            if (!DeserCopyDone || !Cheating)
+            {
+                RegenAppObj = FromSerObject(regenTMsg);
+                DeserCopyDone = true;
+            }
+        }
 
         protected virtual T FromSerObject(U regenTMsg)
         {
-            RegenAppObj = new T();
             RegenAppObj.InjectFrom(regenTMsg); // inject most values                
             return RegenAppObj;
         }
 
         protected virtual U ToSerObject(T thisObj)
         {
-            CodeGenObjSer = new U();
             CodeGenObjSer.InjectFrom(thisObj); // inject most values
             return CodeGenObjSer;
         }
