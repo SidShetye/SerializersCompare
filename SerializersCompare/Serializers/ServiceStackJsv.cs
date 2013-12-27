@@ -1,26 +1,23 @@
-﻿using System.Collections.Generic;
-using ServiceStack.Text;
+﻿using ServiceStack.Text;
 
 namespace SerializersCompare.Serializers
 {
-    public class ServiceStackJsv<T> : ITestSerializers<T>
+    public class ServiceStackJsv<T> : SerializerBase<T>
     {
-        public string GetName()
+        public ServiceStackJsv()
         {
-            return "ServiceStackJSV";
+            SerName = "ServiceStackJSV";
+            IsBinarySerializer = false;
         }
 
-        public bool IsBinary()
+        
+        public override dynamic Serialize(object thisObj)
         {
-            return false;
+            SerString = TypeSerializer.SerializeToString(thisObj);
+            return SerString;
         }
 
-        public dynamic Serialize(object thisObj)
-        {
-            return TypeSerializer.SerializeToString(thisObj);
-        }
-
-        public T Deserialize(dynamic jsv)
+        public override T Deserialize(dynamic jsv)
         {
             return TypeSerializer.DeserializeFromString<T>((string)jsv);
         }

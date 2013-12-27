@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Avro.IO;
 using Avro.Specific;
-using Omu.ValueInjecter;
 
 namespace SerializersCompare.Serializers
 {
@@ -10,13 +8,8 @@ namespace SerializersCompare.Serializers
     {
         public Avro(bool enableCheating = false): base(enableCheating)
         {
-
-        }
-
-        public override string GetName()
-        {
-            Name = "Avro";
-            return base.GetName();
+            IsBinarySerializer = true;
+            SerName = "Avro";
         }
 
         public override dynamic Serialize(object thisObj)
@@ -30,7 +23,8 @@ namespace SerializersCompare.Serializers
                 var writer = new SpecificDefaultWriter(InheritedEntityAvro._SCHEMA); // Schema comes from pre-compiled, code-gen phase
                 writer.Write(CodeGenObjSer, enc);
 
-                return ms.ToArray();
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 
@@ -49,19 +43,5 @@ namespace SerializersCompare.Serializers
                 return RegenAppObj;
             }
         }
-
-        //private T FromAvroObject(InheritedEntityAvro regenTMsg)
-        //{
-        //    _regenAppObj = new T();
-        //    _regenAppObj.InjectFrom(regenTMsg); // inject most values                
-        //    return _regenAppObj;
-        //}
-
-        //private InheritedEntityAvro ToAvroObject(T thisObj)
-        //{
-        //    _codeGenObjSer = new InheritedEntityAvro();
-        //    _codeGenObjSer.InjectFrom(thisObj); // inject all values
-        //    return _codeGenObjSer;
-        //}
     }
 }

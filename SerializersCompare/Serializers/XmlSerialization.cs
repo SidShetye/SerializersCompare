@@ -1,23 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Xml.Serialization;
 using System.IO;
 
 namespace SerializersCompare.Serializers
 {
-    public class XmlDotNet<T> : ITestSerializers<T>
+    public class XmlDotNet<T> : SerializerBase<T>
     {
-        public string GetName()
+        public XmlDotNet()
         {
-            return "Xml .NET";
+            SerName = "XmlSerializer";
+            IsBinarySerializer = false;
         }
 
-        public bool IsBinary()
-        {
-            return false;
-        }
-
-        public dynamic Serialize(object thisObj)
+        public override dynamic Serialize(object thisObj)
         {
             using (var ms = new MemoryStream())
             {
@@ -26,13 +21,12 @@ namespace SerializersCompare.Serializers
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var reader = new StreamReader(ms, Encoding.UTF8);
-                string outString = reader.ReadToEnd();
-
-                return outString;
+                SerString = reader.ReadToEnd();
+                return SerString;
             }
         }
 
-        public T Deserialize(dynamic xml)
+        public override T Deserialize(dynamic xml)
         {
             byte[] byteArray = Encoding.UTF8.GetBytes((string)xml);
             using (var ms = new MemoryStream(byteArray))

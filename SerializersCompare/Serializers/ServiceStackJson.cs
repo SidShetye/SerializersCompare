@@ -1,26 +1,22 @@
-﻿using System.Collections.Generic;
-using ServiceStack.Text;
+﻿using ServiceStack.Text;
 
 namespace SerializersCompare.Serializers
 {
-    public class ServiceStackJson<T> : ITestSerializers<T>
+    public class ServiceStackJson<T> : SerializerBase<T>
     {
-        public string GetName()
+        public ServiceStackJson()
         {
-            return "ServiceStackJson";
+            SerName = "ServiceStackJson";
+            IsBinarySerializer = false;
         }
 
-        public bool IsBinary()
+        public override dynamic Serialize(object thisObj)
         {
-            return false;
+            SerString = JsonSerializer.SerializeToString(thisObj);
+            return SerString;
         }
 
-        public dynamic Serialize(object thisObj)
-        {
-            return JsonSerializer.SerializeToString(thisObj);
-        }
-
-        public T Deserialize(dynamic json)
+        public override T Deserialize(dynamic json)
         {
             return JsonSerializer.DeserializeFromString<T>((string)json);
         }

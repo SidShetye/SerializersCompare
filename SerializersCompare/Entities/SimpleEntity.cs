@@ -6,7 +6,7 @@ using ProtoBuf;
 namespace SerializersCompare.Entities
 {
     [Serializable]
-    [DataContract(Name = "SimpleEntity", Namespace = "com.GitHub.SerializersCompare.Entities")]
+    [DataContract]
     [ProtoInclude(100, typeof(InheritedEntity))]
     public class SimpleEntity
     {
@@ -35,18 +35,18 @@ namespace SerializersCompare.Entities
         public string AddressLine2 { get; set; }
 
         [DataMember(Order = 90)]
-        public byte[] Icon { get; set; }    
+        public byte[] Icon { get; set; }
 
         public void FillDummyData()
         {
             Message = "Hello World!";
-            FunctionCall = "FunctionNameHere";
+            FunctionCall = "FooBarFunction";
             Parameters = "x=1,y=2,z=3";
-            Name = "Mickey Mouse";
+            Name = "Mr John Doe";
             EmployeeId = 1;
             RaiseRate = 1.2F;
-            AddressLine1 = "1 Disney Street";
-            AddressLine2 = "Disneyland, CA";
+            AddressLine1 = "5775 Morehouse Dr";
+            AddressLine2 = "San Diego, CA";
 
             Icon = new byte[16];
             var rng = new RNGCryptoServiceProvider();

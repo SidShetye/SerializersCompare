@@ -47,7 +47,7 @@ namespace SerializersCompare
                         break;
                     case 'X':
                         //var expt = new Experiments.ThriftClientServerExpt();
-                        var expt = new Experiments.ThriftSerialization();
+                        var expt = new Experiments.AvroExpt();
                         expt.RunExpt1();
                         break;
                     default:
@@ -120,6 +120,7 @@ namespace SerializersCompare
             var originalObject = new InheritedEntity();
             originalObject.FillDummyData();
             Test = new Test<InheritedEntity>();
+            //Test = new Test<SimpleEntity>();
 
             Results = Test.RunTests(originalObject, NumOfObjects);
         }

@@ -11,13 +11,8 @@ namespace SerializersCompare.Serializers
         public Thrift(bool enableCheating = false)
             : base(enableCheating)
         {
-
-        }
-
-        public override string GetName()
-        {
-            Name = "Thrift";
-            return base.GetName();
+            IsBinarySerializer = true;
+            SerName = "Thrift";
         }
 
         public override dynamic Serialize(object thisObj)
@@ -29,7 +24,8 @@ namespace SerializersCompare.Serializers
             {
                 var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
                 CodeGenObjSer.Write(tproto);
-                return ms.ToArray();
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 

@@ -2,11 +2,12 @@
 {
     public interface ITestSerializers<T>
     {
-        string GetName();
+        string Name();
+
         bool IsBinary();
 
-        dynamic Serialize(object thisObj); // Most serializers don't need the <T> generic
-                                              // but few DO (eg .NET XML).
+        dynamic Serialize(object thisObj); 
+
         T Deserialize(dynamic serInput);
     }
 }

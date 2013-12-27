@@ -1,26 +1,22 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SerializersCompare.Serializers
 {
-    public class JsonNet<T> : ITestSerializers<T>
+    public class JsonNet<T> : SerializerBase<T>
     {
-        public string GetName()
+        public JsonNet()
         {
-            return "Json.NET";
+            IsBinarySerializer = false;
+            SerName = "Json.NET";
         }
 
-        public bool IsBinary()
+        public override dynamic Serialize(object thisObj)
         {
-            return false;
+            SerString = JsonConvert.SerializeObject(thisObj);
+            return SerString;
         }
 
-        public dynamic Serialize(object thisObj)
-        {
-            return JsonConvert.SerializeObject(thisObj);
-        }
-
-        public T Deserialize(dynamic json)
+        public override T Deserialize(dynamic json)
         {
             return JsonConvert.DeserializeObject<T>((string)json);
         }

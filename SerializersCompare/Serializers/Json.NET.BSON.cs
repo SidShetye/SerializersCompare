@@ -5,30 +5,27 @@ using Newtonsoft.Json.Bson;
 
 namespace SerializersCompare.Serializers
 {
-    public class JsonNetBson<T> : ITestSerializers<T>
+    public class JsonNetBson<T> : SerializerBase<T>
     {
-        public string GetName()
+        public JsonNetBson()
         {
-            return "Json.NET BSON";
+            IsBinarySerializer = true;
+            SerName = "Json.NET BSON";
         }
 
-        public bool IsBinary()
-        {
-            return true;
-        }
-
-        public dynamic Serialize(object thisObj)
+        public override dynamic Serialize(object thisObj)
         {
             using (var ms = new MemoryStream())
             using (var writer = new BsonWriter(ms))
             {
                 var serializer = new JsonSerializer();
                 serializer.Serialize(writer, thisObj);
-                return ms.ToArray();
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 
-        public T Deserialize(dynamic bson)
+        public override T Deserialize(dynamic bson)
         {
             using (var ms = new MemoryStream(bson))
             using (var reader = new BsonReader(ms))

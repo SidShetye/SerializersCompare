@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Avro">
-      <HintPath>..\lib\avro-csharp-1.7.5\main\Release\Avro.dll</HintPath>
+      <HintPath>..\lib\avro-1.7.5\main\Release\Avro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Hadoop.Avro">
       <HintPath>..\packages\Microsoft.Hadoop.Avro.0.8.4951.5418\lib\net40\Microsoft.Hadoop.Avro.dll</HintPath>
@@ -76,14 +76,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\InheritedEntity.cs" />
+    <Compile Include="Experiments\AvroExpt.cs" />
     <Compile Include="Experiments\ExptDummy.cs" />
     <Compile Include="Experiments\ThriftClientServerExpt.cs" />
     <Compile Include="Experiments\ThriftSerialization.cs" />
     <Compile Include="ResultPrinter.cs" />
     <Compile Include="Results.cs" />
+    <Compile Include="Serializers\Avro\SimpleEntityAvro.cs" />
     <Compile Include="Serializers\CodeGenSersBase.cs" />
     <Compile Include="Serializers\AvroMsft.cs" />
     <Compile Include="Serializers\Avro\InheritedEntityAvro.cs" />
+    <Compile Include="Serializers\SerializerBase.cs" />
     <Compile Include="Serializers\Thrift.cs" />
     <Compile Include="Serializers\Avro.cs" />
     <Compile Include="Serializers\BinFormatter.cs" />
@@ -108,13 +111,16 @@
     <None Include="app.config" />
     <None Include="code-gen.bat" />
     <None Include="packages.config" />
-    <None Include="Serializers\Avro\InheritedEntity.avsc" />
     <None Include="Serializers\Thrift\MultiplicationService.thrift" />
     <None Include="Serializers\Thrift\InheritedEntityThrift.thrift" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

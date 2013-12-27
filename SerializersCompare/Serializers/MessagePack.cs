@@ -1,33 +1,29 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using MsgPack.Serialization;
 
 namespace SerializersCompare.Serializers
 {
-    public class MessagePack<T> : ITestSerializers<T>
+    public class MessagePack<T> : SerializerBase<T>
     {
-        public string GetName()
+        public MessagePack()
         {
-            return "MessagePack";
+            SerName = "MessagePack";
+            IsBinarySerializer = true;
         }
 
-        public bool IsBinary()
-        {
-            return true;
-        }
-
-        public dynamic Serialize(object thisObj)
+        public override dynamic Serialize(object thisObj)
         {
             var serializer = MessagePackSerializer.Create<T>();
 
-            using (var byteStream = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                serializer.Pack(byteStream, (T)thisObj);
-                return byteStream.ToArray();
+                serializer.Pack(ms, (T)thisObj);
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 
-        public T Deserialize(dynamic bytes)
+        public override T Deserialize(dynamic bytes)
         {
             var serializer = MessagePackSerializer.Create<T>();
             using (var byteStream = new MemoryStream(bytes))

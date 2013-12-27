@@ -1,32 +1,28 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SerializersCompare.Serializers
 {
-    public class BinFormatter<T> : ITestSerializers<T>
+    public class BinFormatter<T> : SerializerBase<T>
     {
-        public string GetName()
+        public BinFormatter()
         {
-            return "Binary Formatter";
+            SerName = "Binary Formatter";
+            IsBinarySerializer = true;
         }
 
-        public bool IsBinary()
-        {
-            return true;
-        }
-
-        public dynamic Serialize(object thisObj)
+        public override dynamic Serialize(object thisObj)
         {
             using (var ms = new MemoryStream())
             {
                 var bf = new BinaryFormatter(); 
                 bf.Serialize(ms, thisObj);
-                return ms.GetBuffer();
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 
-        public T Deserialize(dynamic bytes)
+        public override T Deserialize(dynamic bytes)
         {
             using (var ms = new MemoryStream((byte[])bytes))
             {

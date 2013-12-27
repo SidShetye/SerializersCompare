@@ -73,7 +73,7 @@ namespace SerializersCompare
             var warmup = TestSerializer<T>(ser, 1, out sizeInBytes, out success, out regeneratedObjAsJson);
 
             // Actual test loop
-            result.SerName = ser.GetName();
+            result.SerName = ser.Name();
             result.ResultColumn = new List<ResultColumnEntry>();
 
             // Serialize => Deserialize, "numOfObjects" times to average per object times

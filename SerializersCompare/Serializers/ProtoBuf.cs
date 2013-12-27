@@ -1,31 +1,27 @@
-﻿using System.Collections.Generic;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System.IO;
 
 namespace SerializersCompare.Serializers
 {
-    public class ProtoBuf<T> : ITestSerializers<T>
+    public class ProtoBuf<T> : SerializerBase<T>
     {
-        public string GetName()
+        public ProtoBuf()
         {
-            return "ProtoBuf";
+            SerName = "ProtoBuf";
+            IsBinarySerializer = true;
         }
 
-        public bool IsBinary()
-        {
-            return true;
-        }
-
-        public dynamic Serialize(object thisObj)
+        public override dynamic Serialize(object thisObj)
         {
             using (var ms = new MemoryStream())
             {
                 Serializer.NonGeneric.Serialize(ms, thisObj);
-                return ms.ToArray();
+                SerBytes = ms.ToArray();
+                return SerBytes;
             }
         }
 
-        public T Deserialize(dynamic bytes)
+        public override T Deserialize(dynamic bytes)
         {
 
             using (var ms = new MemoryStream((byte[])bytes))

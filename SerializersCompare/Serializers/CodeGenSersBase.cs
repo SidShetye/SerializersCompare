@@ -2,7 +2,9 @@
 
 namespace SerializersCompare.Serializers
 {
-    public abstract class CodeGenSersBase<T, U> : ITestSerializers<T> where T : new() where U : new()
+    public abstract class CodeGenSersBase<T, U> : SerializerBase<T>
+        where T : new()
+        where U : new()
     {
         protected U CodeGenObjSer;
         protected T RegenAppObj;
@@ -22,29 +24,19 @@ namespace SerializersCompare.Serializers
         /// questioning. We're using ValueInjecter for now, perhaps AutoMapper is quicker?
         /// </summary>
         protected bool EnableCheating;
-        protected string Name = "Avro";
-
 
         public CodeGenSersBase(bool enableCheating = false)
         {
             EnableCheating = enableCheating;
         }
 
-        public virtual string GetName()
+        public new virtual string Name()
         {
             if (EnableCheating)
-                Name += " (cheating)";
-            return Name;
+                SerName += " (cheating)";
+            return SerName;
         }
 
-        public bool IsBinary()
-        {
-            return true;
-        }
-
-        public abstract dynamic Serialize(object thisObj);
-
-        public abstract T Deserialize(dynamic bytes);        
 
         protected virtual T FromSerObject(U regenTMsg)
         {
