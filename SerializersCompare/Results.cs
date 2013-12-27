@@ -13,9 +13,12 @@ namespace SerializersCompare
 
         // debug
         public string SerializedFormObject { get; set; }
+
         public string OrignalObjectAsJson { get; set; } // stored as JSON for human visualization
         //This is the original object => serialized => deserialized. Should again match original object if all went well!
-        public string TestObjectAsJson { get; set; } // stored as JSON for human visualization
+        public string RegeneratedObjectAsJson { get; set; }
+
+// stored as JSON for human visualization
 
         public static int ByName(Results lhsResult, Results rhsResult)
         {

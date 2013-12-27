@@ -15,12 +15,6 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public void Init(IEnumerable<object> args)
-        {
-
-        }
-
-
         public dynamic Serialize(object thisObj)
         {
             return JsonConvert.SerializeObject(thisObj);

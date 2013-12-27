@@ -10,7 +10,12 @@ namespace SerializersCompare
         public static dynamic Test;
         private const int NumOfObjects = 1000;
 
-        private static char _menuOption = 'T';
+        private static char _menuOption = GetDefaultOption();
+
+        private static char GetDefaultOption()
+        {
+            return 'T';
+        }
 
         static void Main(string[] args)
         {
@@ -22,17 +27,23 @@ namespace SerializersCompare
                 {
                     case 'T':
                         RunTests();
+                        PrintResults();
+                        break;
+                    case 'R':
+                        PrintResults();
                         break;
                     case 'E':
                         stillWorking = false;
                         break;
                     case 'S':
-                        Console.WriteLine("Type the name of the serializer to print:");
-                        string serName = Console.ReadLine();
-                        PrintTestObject(serName);
+                        PrintSerOrDeserObject(GetSerName(), serObj:true);
                         break;
-                    case 'R':
-                        Test.PrintResultTableVertical(Results);
+                    case 'D':
+                        PrintSerOrDeserObject(GetSerName(), serObj: false);
+                        break;
+                    case 'O':
+                        ResultPrinter.BySize = !ResultPrinter.BySize;
+                        PrintResults();
                         break;
                     case 'X':
                         //var expt = new Experiments.ThriftClientServerExpt();
@@ -52,14 +63,26 @@ namespace SerializersCompare
             }
         }
 
+        private static void PrintResults()
+        {
+            ResultPrinter.Print(Results);
+        }
+
+        private static string GetSerName()
+        {
+            Console.WriteLine("Type the name of the serializer to print:");
+            return Console.ReadLine();
+            
+        }
+
         static void PrintMenu()
         {
-            Console.WriteLine("Options: (T)est, (R)esults, (S)erializer output, (E)xit");
+            Console.WriteLine("Options: (T)est, (R)esults, s(O)rt order, (S)erializer output, (D)eserializer output (in JSON form), (E)xit");
         }
 
         static char GetUserSelection()
         {
-            char menuOption = _menuOption; 
+            char menuOption = GetDefaultOption(); 
 
             //ConsoleKeyInfo cki = Console.ReadKey();
             //string inputStr = cki.KeyChar.ToString().ToUpper().Replace(" ", string.Empty);
@@ -73,18 +96,22 @@ namespace SerializersCompare
             return menuOption;
         }
 
-        static void PrintTestObject(string serName)
+        static void PrintSerOrDeserObject(string serName, bool serObj)
         {
             Results resultsThisSer = Results.Find(a => a.SerName == serName);
             if (resultsThisSer != null)
             {
-                Console.WriteLine(resultsThisSer.SerializedFormObject);
+                if (serObj)
+                    Console.WriteLine(resultsThisSer.SerializedFormObject);
+                else
+                    Console.WriteLine(resultsThisSer.RegeneratedObjectAsJson);
+
             }
             else
             {
                 Console.WriteLine("Incorrect serializer name!");
             }
-        }
+        }       
 
         static void RunTests()
         {
@@ -95,7 +122,6 @@ namespace SerializersCompare
             Test = new Test<InheritedEntity>();
 
             Results = Test.RunTests(originalObject, NumOfObjects);
-            Test.PrintResultTableVertical(Results);
         }
     }
 }

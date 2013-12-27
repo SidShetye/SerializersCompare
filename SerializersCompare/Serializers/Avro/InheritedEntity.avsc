@@ -1,0 +1,16 @@
+{"namespace": "SerializersCompare.Serializers",
+ "name": "InheritedEntityAvro",
+ "type": "record",
+ "fields": [
+     {"name": "Message", "type": "string"},
+     {"name": "FunctionCall", "type": "string"},
+     {"name": "Parameters", "type": "string"},
+     {"name": "Name", "type": "string"},
+     {"name": "EmployeeId", "type": "int"},
+     {"name": "RaiseRate", "type": "float"},
+     {"name": "AddressLine1", "type": "string"},
+     {"name": "AddressLine2", "type": "string"},
+     {"name": "Icon", "type": "bytes"},
+     {"name": "LargeIcon", "type": "bytes"}
+ ]
+}

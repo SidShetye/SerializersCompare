@@ -1,51 +1,67 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Microsoft.Hadoop.Avro;
+using Avro.IO;
+using Avro.Specific;
+using Omu.ValueInjecter;
 
 namespace SerializersCompare.Serializers
 {
-    public class Avro<T> : ITestSerializers<T>
+    public class Avro<T> : CodeGenSersBase<T, InheritedEntityAvro> where T : new()
     {
-        public string GetName()
+        public Avro(bool enableCheating = false): base(enableCheating)
         {
-            return "Avro";
+
         }
 
-        public bool IsBinary()
+        public override string GetName()
         {
-            return true;
+            Name = "Avro";
+            return base.GetName();
         }
 
-        public void Init(IEnumerable<object> args)
+        public override dynamic Serialize(object thisObj)
         {
-            //StreamWriter schemafs = new StreamWriter(File.Create(@"SampleData.avsc"));
-            //schemafs.Write(serializer.Schema.ToString());
-            //schemafs.Close(); 
-        }
+            if (CodeGenObjSer == null || !EnableCheating)
+                CodeGenObjSer = ToSerObject((T)thisObj);
 
-        // Note, this can be made faster if we generate the schema file (.avsc)
-        // first and then use schema files at runtime.
-        // We're skipping that step here (code gen) since the rest of the project
-        // doesn't support an init() or codegen() phase (yet!)
-        public dynamic Serialize(object thisObj)
-        {
-            var serializer = new AvroSerializer(thisObj.GetType());
-
-            using (var byteStream = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                serializer.Serialize(thisObj, byteStream);
-                return byteStream.ToArray();
+                var enc = new BinaryEncoder(ms);
+                var writer = new SpecificDefaultWriter(InheritedEntityAvro._SCHEMA); // Schema comes from pre-compiled, code-gen phase
+                writer.Write(CodeGenObjSer, enc);
+
+                return ms.ToArray();
             }
         }
 
-        public T Deserialize(dynamic bytes)
+        public override T Deserialize(dynamic bytes)
         {
-            var serializer = new AvroSerializer(typeof(T));
-
-            using (var ms = new MemoryStream((byte[])bytes))
+            using (var ms = new MemoryStream(bytes))
             {
-                return serializer.Deserialize<T>(ms);
+                var dec = new BinaryDecoder(ms);
+                var reader = new SpecificDefaultReader(InheritedEntityAvro._SCHEMA, InheritedEntityAvro._SCHEMA);
+                var regenAvroMsg = new InheritedEntityAvro();
+                reader.Read(regenAvroMsg, dec); //TODO: reuse the regenAvroMsg object?
+
+                if (RegenAppObj == null || !EnableCheating)
+                    RegenAppObj = FromSerObject(regenAvroMsg);
+
+                return RegenAppObj;
             }
         }
+
+        //private T FromAvroObject(InheritedEntityAvro regenTMsg)
+        //{
+        //    _regenAppObj = new T();
+        //    _regenAppObj.InjectFrom(regenTMsg); // inject most values                
+        //    return _regenAppObj;
+        //}
+
+        //private InheritedEntityAvro ToAvroObject(T thisObj)
+        //{
+        //    _codeGenObjSer = new InheritedEntityAvro();
+        //    _codeGenObjSer.InjectFrom(thisObj); // inject all values
+        //    return _codeGenObjSer;
+        //}
     }
 }

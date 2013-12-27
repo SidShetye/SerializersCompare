@@ -21,7 +21,7 @@ namespace SerializersCompare.Experiments
 
 
             // Serialization
-            var tmsg = new InheritedThriftEntity();
+            var tmsg = new InheritedEntityThrift();
             tmsg.InjectFrom(origMsg);
             var ms = new MemoryStream();
             var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
@@ -33,7 +33,7 @@ namespace SerializersCompare.Experiments
             // Deserialization
             var ms2 = new MemoryStream(tbytes);
             var tproto2 = new TCompactProtocol(new TStreamTransport(ms2, ms2));
-            var regenTMsg = new InheritedThriftEntity();
+            var regenTMsg = new InheritedEntityThrift();
             regenTMsg.Read(tproto2);
             var regenMsg = new InheritedEntity();
             regenMsg.InjectFrom(regenTMsg);

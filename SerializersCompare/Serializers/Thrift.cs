@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Omu.ValueInjecter;
 using SerializersCompare.Serializers.Thrift;
 using Thrift.Protocol;
@@ -7,78 +6,59 @@ using Thrift.Transport;
 
 namespace SerializersCompare.Serializers
 {
-    public class Thrift<T> : ITestSerializers<T> where T : new()
+    public class Thrift<T> : CodeGenSersBase<T, InheritedEntityThrift> where T : new()
     {
-        private InheritedThriftEntity _tmsgSer;
-        private T _regenMsg;
-
-        private const bool ThriftCheating = true;
-
-        public string GetName()
+        public Thrift(bool enableCheating = false)
+            : base(enableCheating)
         {
-            return "Thrift";
+
         }
 
-        public bool IsBinary()
+        public override string GetName()
         {
-            return true;
+            Name = "Thrift";
+            return base.GetName();
         }
 
-        public void Init(IEnumerable<object> args)
+        public override dynamic Serialize(object thisObj)
         {
-        }
-
-        public dynamic Serialize(object thisObj)
-        {
-            // We do this just once, so that the impact of injecting values from our app object
-            // to thrift objects is minimized to just the very first time we do this. 
-            // Could be considered 'cheating' since in real apps, it's likely this sort of 
-            // object injection/projection might be unavoidable due to thrift design
-            if (_tmsgSer == null && ThriftCheating)
-                _tmsgSer = ToThriftObject((T)thisObj);
+            if (CodeGenObjSer == null || !EnableCheating)
+                CodeGenObjSer = ToSerObject((T)thisObj);
 
             using (var ms = new MemoryStream())
             {
                 var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
-                _tmsgSer.Write(tproto);
+                CodeGenObjSer.Write(tproto);
                 return ms.ToArray();
             }
         }
 
-        public T Deserialize(dynamic bytes)
+        public override T Deserialize(dynamic bytes)
         {
             using (var ms = new MemoryStream(bytes))
             {
                 var tproto = new TCompactProtocol(new TStreamTransport(ms, ms));
-                var regenTMsg = new InheritedThriftEntity();
+                var regenTMsg = new InheritedEntityThrift();
                 regenTMsg.Read(tproto);
+                if (RegenAppObj == null || !EnableCheating)
+                    RegenAppObj = FromSerObject(regenTMsg);
 
-                if (_regenMsg == null && ThriftCheating)
-                    _regenMsg = FromThriftObject(regenTMsg);
-
-                return _regenMsg;
+                return RegenAppObj;
             }
         }
 
-        private T FromThriftObject(InheritedThriftEntity regenTMsg)
+        protected override T FromSerObject(InheritedEntityThrift regenTMsg)
         {
-            _regenMsg = new T();
-            _regenMsg.InjectFrom(regenTMsg) // inject most values
-                .InjectFrom<DoubleToFloat>(regenTMsg); // special call to inject the double (thrift) to float (C#)
-
-            return _regenMsg;
+            RegenAppObj = base.FromSerObject(regenTMsg);            
+            RegenAppObj.InjectFrom<DoubleToFloat>(regenTMsg); // special call to inject the double (thrift) to float (C#)
+            return RegenAppObj;
         }
 
-        private InheritedThriftEntity ToThriftObject(T thisObj)
+        protected override InheritedEntityThrift ToSerObject(T thisObj)
         {
-            _tmsgSer = new InheritedThriftEntity();
-            // Thrift needs to use it's own code-gen proxy objects
-            // so no elegant way here :(
-            _tmsgSer.InjectFrom(thisObj). // inject all values
-                InjectFrom<FloatToDouble>(thisObj);
-            // special call to inject the float (C#) into the double (thrift)
-
-            return _tmsgSer;
+            CodeGenObjSer = base.ToSerObject(thisObj);
+            CodeGenObjSer.InjectFrom<FloatToDouble>(thisObj); // special call to inject the float (C#) into the double (thrift)
+            return CodeGenObjSer;
         }
     }
 }

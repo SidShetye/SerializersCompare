@@ -16,11 +16,6 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public void Init(IEnumerable<object> args)
-        {
-
-        }
-
         public dynamic Serialize(object thisObj)
         {
             var serializer = MessagePackSerializer.Create<T>();
