@@ -24,6 +24,8 @@ Results
 	Binary Formatter      748     0.0344
 
 	Options: (T)est, (R)esults, s(O)rt order, (S)erializer output, (D)eserializer output (in JSON form), (E)xit
+    
+    Serialized via ASN.1 DER encoding to 148 bytes in 0.0674ms (hacked experiment!)
 
 Notes
 -----
