@@ -1,4 +1,5 @@
-﻿using ServiceStack.Text;
+﻿using System.Collections.Generic;
+using ServiceStack.Text;
 
 namespace SerializersCompare.Serializers
 {
@@ -14,7 +15,7 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
 
         }

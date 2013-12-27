@@ -87,6 +87,7 @@
     <Compile Include="Serializers\ProtoBuf.cs" />
     <Compile Include="Serializers\Thrift\gen-csharp\InheritedThriftEntity.cs" />
     <Compile Include="Serializers\Thrift\gen-csharp\MultiplicationService.cs" />
+    <Compile Include="Serializers\Thrift\InjectionExt.cs" />
     <Compile Include="Serializers\XmlSerialization.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Utils\JsonPrettyPrint.cs" />

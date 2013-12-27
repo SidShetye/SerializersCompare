@@ -7,55 +7,58 @@ using SerializersCompare.Utils;
 
 namespace SerializersCompare
 {
-    class Test
+    class Test<T> where T : new()
     {
         private object _originalObject;
-        private object _testObject;
+        private T _testObject;
 
-        public List<Results> RunTests<T>(T originalObj, T testObj) where T : new()
+        public List<Results> RunTests(T originalObj, int numOfObjects)
         {
-            _originalObject = originalObj;
-            _testObject = testObj;
+            _originalObject = originalObj;            
 
-            const int loopLimit = 10000;
             var resultTable = new List<Results>();
 
             // BINARY SERIALIZERS
             // ProtoBuf test
-            resultTable.Add(TestSerializerInLoop<T>(new ProtoBuf<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ProtoBuf<T>(), numOfObjects));
 
             // Avro test
-            resultTable.Add(TestSerializerInLoop<T>(new Avro<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new Avro<T>(), numOfObjects));
 
-            // Avro test
-            resultTable.Add(TestSerializerInLoop<T>(new Thrift<T>(), loopLimit));
+            // Thrift test
+            resultTable.Add(TestSerializerInLoop<T>(new Thrift<T>(), numOfObjects));
 
             //MessagePack
-            resultTable.Add(TestSerializerInLoop<T>(new MessagePack<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new MessagePack<T>(), numOfObjects));
 
             // Json.NET.BSON test
-            resultTable.Add(TestSerializerInLoop<T>(new JsonNetBson<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNetBson<T>(), numOfObjects));
 
             // BinaryFormatter test
-            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new BinFormatter<T>(), numOfObjects));
             
             // TEXT SERIALIZERS
             // Json.NET test
-            resultTable.Add(TestSerializerInLoop<T>(new JsonNet<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new JsonNet<T>(), numOfObjects));
 
             // ServiceStackTextJson test
-            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJson<T>(), numOfObjects));
 
             // ServiceStackTextJsv test
-            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new ServiceStackJsv<T>(), numOfObjects));
 
             // .NET XML serializer
-            resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet<T>(), loopLimit));
+            resultTable.Add(TestSerializerInLoop<T>(new XmlDotNet<T>(), numOfObjects));
 
             return resultTable;
         }
 
-        public void PrintResultTable(List<Results> resultTable)
+        /// <summary>
+        /// This is useful when printing serializers, times across multiple
+        /// iterations. Yields a rather wide table that looks ugly in a console
+        /// </summary>
+        /// <param name="resultTable"></param>
+        public void PrintResultTableHorizontal(List<Results> resultTable)
         {
             // Stores as lists top-down but console printing is left to right!
             // This is inherently ugly, can be fixed if so desired
@@ -68,8 +71,8 @@ namespace SerializersCompare
             Console.Write(formatString, toPrint);
             for (int i = 0; i < resultTable.Count; i++)
             {
-                toPrint = String.Format("{0}", resultTable[i].serName);
-                formatString = String.Format("{{0,{0}}}", colN );
+                toPrint = String.Format("{0}", resultTable[i].SerName);
+                formatString = String.Format("{{0,{0}}}", colN);
                 Console.Write(formatString, toPrint);
             }
             Console.Write(Environment.NewLine);
@@ -80,24 +83,24 @@ namespace SerializersCompare
             Console.Write(formatString, toPrint);
             for (int i = 0; i < resultTable.Count; i++)
             {
-                toPrint = String.Format("Size:{0} bytes", resultTable[i].sizeBytes);
-                formatString = String.Format("{{0,{0}}}", colN );
+                toPrint = String.Format("Size:{0} bytes", resultTable[i].SizeBytes);
+                formatString = String.Format("{{0,{0}}}", colN);
                 Console.Write(formatString, toPrint);
             }
             Console.Write(Environment.NewLine);
 
             // Rest of Table
             //Assumes: all colums have same length and rows line-up for same loop count
-            for (int row = 0; row < resultTable[0].resultColumn.Count; row++)
+            for (int row = 0; row < resultTable[0].ResultColumn.Count; row++)
             {
                 formatString = String.Format("{{0,{0}}}", col1);
-                toPrint = resultTable[0].resultColumn[row].iteration.ToString();
+                toPrint = resultTable[0].ResultColumn[row].Iteration.ToString();
                 Console.Write(formatString, toPrint);
 
                 for (int i = 0; i < resultTable.Count; i++)
                 {
-                    formatString = String.Format("{{0,{0}}}", colN );
-                    toPrint = String.Format("{0,4:n4} ms", resultTable[i].resultColumn[row].time.TotalMilliseconds);
+                    formatString = String.Format("{{0,{0}}}", colN);
+                    toPrint = String.Format("{0,4:n4} ms", resultTable[i].ResultColumn[row].Time.TotalMilliseconds);
                     Console.Write(formatString, toPrint);
                 }
                 Console.Write(Environment.NewLine);
@@ -106,41 +109,90 @@ namespace SerializersCompare
             Console.WriteLine("If the above looks messy, please set your console width to over 200 and rerun this program");
 
         }
+        
+        /// <summary>
+        /// This is to print a single list of serializers vs time. Basically vertical
+        /// representation of a single slice of the horizontal table
+        /// </summary>
+        /// <param name="resultTable"></param>
+        public void PrintResultTableVertical(List<Results> resultTable)
+        {
+            // SORT
+            resultTable.Sort(Results.BySize);
 
-        private Results TestSerializerInLoop<T>(dynamic ser, int loopLimit)
+            // PRINT TEST INFO
+            int numOfObjects = 0;
+            var firstOrDefault = resultTable.FirstOrDefault();
+            if (firstOrDefault != null)
+            {
+                var resultColumnEntry = firstOrDefault.ResultColumn.FirstOrDefault();
+                if (resultColumnEntry != null)
+                {
+                    numOfObjects = resultColumnEntry.Iteration;
+                }
+            }
+            Console.WriteLine("{0} cycles of object serialization->deserialization", numOfObjects);
+            Console.WriteLine("Printing results, sorted by smallest payload size first ... \n");
+
+            // PRINT HEADER
+            const string fmtString = "{0,-16} {1,6} {2,10}";
+            var hdr = String.Format(fmtString, "Name", "Bytes", "Time (ms)");
+            Console.WriteLine(hdr);
+            for (int i = 0; i < hdr.Length; i++)            
+                Console.Write("-");            
+            Console.WriteLine();
+
+            // PRINT ACTUAL RESULTS
+            foreach (var result in resultTable)
+            {
+                var resultColumnEntry = result.ResultColumn.FirstOrDefault();
+                var timeString = (resultColumnEntry != null) ? 
+                    String.Format("{0,4:n4}", resultColumnEntry.Time.TotalMilliseconds) : 
+                    "Error";
+
+                Console.WriteLine(fmtString, result.SerName, result.SizeBytes, timeString);
+            }
+            Console.WriteLine();
+        }
+
+        private Results TestSerializerInLoop<T>(dynamic ser, int numOfObjects)
         {
             int sizeInBytes;
             bool success;
             string testObjJson;
-            int i = 1;
             var result = new Results();
-            var warmUpObjects = new List<object>();
             
-            result.serName = ser.GetName();
-            result.resultColumn = new List<ResultColumnEntry>();
-            do
-            {
-                // test at this loop count
-                ResultColumnEntry resultEntry = TestSerializer<T>(ser, i, out sizeInBytes, out success, out testObjJson);
-                result.resultColumn.Add(resultEntry);
-                i = i * 2;    // geometrically scale loop at x2
-            } while (i <= loopLimit);
+            // Init
+            var initArgs = new List<T>();
+            initArgs.Add((T) _originalObject);
+            ser.Init(initArgs);
 
-            result.sizeBytes = sizeInBytes;
-            result.success = success;
-            result.testObjectAsJson = testObjJson; // for debug
-            result.serializedFormObject = PrintSerializedOutput<T>(ser); // for debug
+            // Warmup
+            var warmup = TestSerializer<T>(ser, 1, out sizeInBytes, out success, out testObjJson);
+
+            // Actual test loop
+            result.SerName = ser.GetName();
+            result.ResultColumn = new List<ResultColumnEntry>();
+
+            // Serialize => Deserialize, "numOfObjects" times to average per object times
+            ResultColumnEntry resultEntry = TestSerializer<T>(ser, numOfObjects, out sizeInBytes, out success, out testObjJson);
+            result.ResultColumn.Add(resultEntry);
+
+            result.SizeBytes = sizeInBytes;
+            result.Success = success;
+            result.TestObjectAsJson = testObjJson; // for debug
+            result.SerializedFormObject = PrintSerializedOutput(ser); // for debug
 
             return result;
         }
 
-        private string PrintSerializedOutput<T>(dynamic ser)
+        private string PrintSerializedOutput(dynamic ser)
         {
             string strOutput;
             if (ser.IsBinary())
             {
                 byte[] binOutput = ser.Serialize(_originalObject);
-                strOutput = BitConverter.ToString(binOutput).Replace("-", " ");
+                strOutput = BitConverter.ToString(binOutput);
             }
             else
             {
@@ -149,9 +201,9 @@ namespace SerializersCompare
             return strOutput;
         }
 
-        private ResultColumnEntry TestSerializer<T>(dynamic ser, int iterations, out int sizeInBytes, out bool success, out string testObjJson)
+        private ResultColumnEntry TestSerializer<T>(dynamic ser, int numOfObjects, out int sizeInBytes, out bool success, out string testObjJson)
         {
-            Stopwatch sw = new Stopwatch();
+            var sw = new Stopwatch();
             
             // BINARY serializers 
             // eg: ProtoBufs, Bin Formatter etc
@@ -160,7 +212,7 @@ namespace SerializersCompare
                 byte[] binOutput;
                 sw.Reset();
                 sw.Start();
-                for (int i = 0; i < iterations; i++)
+                for (int i = 0; i < numOfObjects; i++)
                 {
                     binOutput = ser.Serialize(_originalObject);
                     _testObject = ser.Deserialize(binOutput);
@@ -176,7 +228,7 @@ namespace SerializersCompare
             {
                 sw.Reset();
                 sw.Start();
-                for (int i = 0; i < iterations; i++)
+                for (int i = 0; i < numOfObjects; i++)
                 {
                     string strOutput = ser.Serialize(_originalObject);
                     _testObject = ser.Deserialize(strOutput);
@@ -190,15 +242,14 @@ namespace SerializersCompare
                 sizeInBytes = strInBytes.Count();
             }
             var entry = new ResultColumnEntry();
-            entry.iteration = iterations;
-            long avgTicks = sw.Elapsed.Ticks / iterations;
+            entry.Iteration = numOfObjects;
+            long avgTicks = sw.Elapsed.Ticks / numOfObjects;
             if (avgTicks == 0)
             {
                 // sometime when running windows inside a VM this is 0! Possible vm issue?
                 //Debugger.Break();
             }
-            entry.time = new TimeSpan(avgTicks);
-
+            entry.Time = new TimeSpan(avgTicks);
 
             // Debug: To aid printing to screen, human debugging etc. Json used as best for console presentation
             var jsonSer = new JsonNet<T>();

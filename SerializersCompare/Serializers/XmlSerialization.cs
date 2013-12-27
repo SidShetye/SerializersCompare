@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Xml.Serialization;
 using System.IO;
 
@@ -16,7 +17,7 @@ namespace SerializersCompare.Serializers
             return false;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
 
         }

@@ -7,16 +7,18 @@ namespace SerializersCompare
     class Program
     {
         public static List<Results> Results;
-        public static Test Test = new Test();
+        public static dynamic Test;
+        private const int NumOfObjects = 1000;
+
+        private static char _menuOption = 'T';
 
         static void Main(string[] args)
         {
             bool stillWorking = true;
-            char menuOption = 'T';
 
             while (stillWorking)
             {
-                switch (menuOption)
+                switch (_menuOption)
                 {
                     case 'T':
                         RunTests();
@@ -24,13 +26,13 @@ namespace SerializersCompare
                     case 'E':
                         stillWorking = false;
                         break;
-                    case 'D':
+                    case 'S':
                         Console.WriteLine("Type the name of the serializer to print:");
                         string serName = Console.ReadLine();
                         PrintTestObject(serName);
                         break;
                     case 'R':
-                        Test.PrintResultTable(Results);
+                        Test.PrintResultTableVertical(Results);
                         break;
                     case 'X':
                         //var expt = new Experiments.ThriftClientServerExpt();
@@ -45,19 +47,19 @@ namespace SerializersCompare
                 if (stillWorking)
                 {
                     PrintMenu();
-                    menuOption = GetUserSelection();
+                    _menuOption = GetUserSelection();
                 }
             }
         }
 
         static void PrintMenu()
         {
-            Console.WriteLine("Options: (T)est, (R)esults, (D)eserializer output, (E)xit");
+            Console.WriteLine("Options: (T)est, (R)esults, (S)erializer output, (E)xit");
         }
 
         static char GetUserSelection()
         {
-            char menuOption = '~'; // some char not in selection 
+            char menuOption = _menuOption; 
 
             //ConsoleKeyInfo cki = Console.ReadKey();
             //string inputStr = cki.KeyChar.ToString().ToUpper().Replace(" ", string.Empty);
@@ -73,10 +75,10 @@ namespace SerializersCompare
 
         static void PrintTestObject(string serName)
         {
-            Results resultsThisSer = Results.Find(a => a.serName == serName);
+            Results resultsThisSer = Results.Find(a => a.SerName == serName);
             if (resultsThisSer != null)
             {
-                Console.WriteLine(resultsThisSer.serializedFormObject);
+                Console.WriteLine(resultsThisSer.SerializedFormObject);
             }
             else
             {
@@ -90,12 +92,10 @@ namespace SerializersCompare
             //var originalObject = new SimpleEntity();
             var originalObject = new InheritedEntity();
             originalObject.FillDummyData();
-            //var testObject = new SimpleEntity();
-            var testObject = new InheritedEntity();
-            
-            Results = Test.RunTests(originalObject, testObject);
-            
-            Test.PrintResultTable(Results);
+            Test = new Test<InheritedEntity>();
+
+            Results = Test.RunTests(originalObject, NumOfObjects);
+            Test.PrintResultTableVertical(Results);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 
@@ -16,7 +17,7 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
 
         }

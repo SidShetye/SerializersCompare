@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System.Collections.Generic;
+using ProtoBuf;
 using System.IO;
 
 namespace SerializersCompare.Serializers
@@ -15,7 +16,7 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
 
         }

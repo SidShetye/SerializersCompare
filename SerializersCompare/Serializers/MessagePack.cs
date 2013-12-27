@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using MsgPack.Serialization;
 
 namespace SerializersCompare.Serializers
@@ -15,7 +16,7 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
 
         }

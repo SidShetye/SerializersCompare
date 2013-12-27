@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Microsoft.Hadoop.Avro;
 
 namespace SerializersCompare.Serializers
@@ -15,9 +16,11 @@ namespace SerializersCompare.Serializers
             return true;
         }
 
-        public void Init()
+        public void Init(IEnumerable<object> args)
         {
-            
+            //StreamWriter schemafs = new StreamWriter(File.Create(@"SampleData.avsc"));
+            //schemafs.Write(serializer.Schema.ToString());
+            //schemafs.Close(); 
         }
 
         // Note, this can be made faster if we generate the schema file (.avsc)
