@@ -26,7 +26,7 @@ Results
 
 Notes
 -----
-The `cheating` tags above simply mean that unlike most serializers, Thrift and Avro code-gen their own data classes and those, not the application's existing classes, are used in transport and RPC. Most real world projects will therefore see extra processing time to copy values from their internal app logic classes into the Thrift/Avro auto-gen'd classes. In contrast, most other serializers (including Avro MSFT) use the app logic classes directly, bypassing the extra copy into the code-gen'd classes. So "cheating" simply means discarding that extra copy time. For real world performance indicators, you should look at figures WITHOUT cheating.
+The `cheating` tags above simply mean that unlike most serializers, Thrift/Avro code-gen their own data classes and those, not the application's existing classes, are used in transport and RPC. Most real world projects will therefore see extra processing time to copy values from their internal app logic classes into the Thrift/Avro auto-gen'd classes. In contrast, most other serializers (including Avro MSFT) use the app logic classes directly, bypassing the extra copy into the code-gen'd classes. So "cheating" simply means discarding that extra copy time. For real world performance indicators, you should look at figures WITHOUT cheating.
 
 Issues
 ------
