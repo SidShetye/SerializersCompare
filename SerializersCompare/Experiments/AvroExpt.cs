@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Avro.IO;
 using Avro.Specific;
 using Microsoft.Hadoop.Avro;
@@ -18,58 +14,105 @@ namespace SerializersCompare.Experiments
     {
         public void RunExpt1()
         {
-            AvroMsftToAvro();
-            AvroToAvroMsft();
+            Console.WriteLine("Experiment to determine binary/wire compatibility between Avro Apache serializer and Avro MSFT serializer." +
+                              "The Microsoft serializer seems to always emit null-able (or optional) fields, so can break compatiblity if the " +
+                              "Avro-Apache schema doesn't have optional fields in it's schema.\n");
+            
+            CompareSchemas();
+
+            try
+            {
+                AvroMsftToAvro();
+                AvroToAvroMsft();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FAILED! UNABLE TO OBSERVE BINARY COMPATIBILITY\n");
+                Console.WriteLine(ex);
+            }
+        }
+
+        private void CompareSchemas()
+        {
+            var eCodeGenEntity = new InheritedEntityAvro();
+
+            // Extra test for schema compare, save schema to compare later
+            string avroSchema = eCodeGenEntity.Schema.ToString();
+
+            // Extra test for schema compare, save schema to compare later
+            var serializer = new AvroSerializer(typeof(InheritedEntity));
+
+            string avroMsftSchema = serializer.Schema;
+
+            Console.Write("\nThe Avro MSFT schema and the Avro Apache schema ");
+            if (String.IsNullOrEmpty(avroSchema) || (avroSchema != avroMsftSchema))
+            {
+                Console.WriteLine("do NOT MATCH !!!\n");
+                Console.WriteLine("Avro Apache schema: {0}", avroSchema);
+                Console.WriteLine("Avro MSFT schema  : {0}", avroMsftSchema);
+            }
+            else
+                Console.WriteLine("match.\n");
+
         }
 
         private void AvroToAvroMsft()
         {
             // avro ser => avro-msft deser
-            var e = new SimpleEntity();
+            
+            var e = new InheritedEntity();
             e.FillDummyData();
-            var eJson = JsonConvert.SerializeObject(e);
 
-            var eCodeGenEntity = new SimpleEntityAvro();
+            // Avro-Apache serialize
+            var eCodeGenEntity = new InheritedEntityAvro();
             eCodeGenEntity.InjectFrom(e);
-
             var eBytes = SerializeAvro(eCodeGenEntity);
-            var eAppEntityRegen = DeserializeAvroMsft(eBytes);
 
+            // Avro MSFT deserialize
+            var eAppEntityRegen = DeserializeAvroMsft(eBytes); 
+
+            // Compare the object (in JSON, easiest to do so)
+            var eJson = JsonConvert.SerializeObject(e);
             var eRegenJson = JsonConvert.SerializeObject(eAppEntityRegen);
 
+            Console.Write("avro ser => avro-msft deser ");
             if (eJson != eRegenJson)
-                Console.WriteLine("avro ser => avro-msft deser FAILED !!!");
+                Console.WriteLine("FAILED !!!");
             else
                 Console.WriteLine("passed");
+
         }
 
         private void AvroMsftToAvro()
         {
             // avro-msft ser => avro deser
-            var e = new SimpleEntity();
-            e.FillDummyData();
-            var eJson = JsonConvert.SerializeObject(e);
 
-            // ser
+            var e = new InheritedEntity();
+            e.FillDummyData();
+
+            // Avro MSFT serialize
             var eBytes = SerializeAvroMsft(e);
 
-            //deser
+            // Avro-Apache deserialize
             var eCodeGenEntity = DeserializeAvro(eBytes);
-            var eAppEntityRegen = new SimpleEntity();
+            var eAppEntityRegen = new InheritedEntity();
             eAppEntityRegen.InjectFrom(eCodeGenEntity);
 
+            // Compare the object (in JSON, easiest to do so)
+            var eJson = JsonConvert.SerializeObject(e);
             var eRegenJson = JsonConvert.SerializeObject(eAppEntityRegen);
 
+            Console.Write("avro-msft ser => avro deser ");
             if (eJson != eRegenJson)
-                Console.WriteLine("avro-msft ser => avro deser FAILED !!!");
+                Console.WriteLine("FAILED !!!");
             else
                 Console.WriteLine("passed");
         }
 
-        public byte[] SerializeAvroMsft(SimpleEntity thisObj)
+        public byte[] SerializeAvroMsft(InheritedEntity thisObj)
         {
             var serializer = new AvroSerializer(thisObj.GetType());
-
+            
             using (var ms = new MemoryStream())
             {
                 serializer.Serialize(thisObj, ms);
@@ -77,35 +120,35 @@ namespace SerializersCompare.Experiments
             }
         }
 
-        public SimpleEntity DeserializeAvroMsft(byte[] bytes)
+        public InheritedEntity DeserializeAvroMsft(byte[] bytes)
         {
-            var serializer = new AvroSerializer(typeof(SimpleEntity));
+            var serializer = new AvroSerializer(typeof(InheritedEntity));
 
             using (var ms = new MemoryStream(bytes))
             {
-                return serializer.Deserialize<SimpleEntity>(ms);
+                return serializer.Deserialize<InheritedEntity>(ms);
             }
         }
 
-        public byte[] SerializeAvro(SimpleEntityAvro thisObj)
+        public byte[] SerializeAvro(InheritedEntityAvro thisObj)
         {
             using (var ms = new MemoryStream())
             {
                 var enc = new BinaryEncoder(ms);
-                var writer = new SpecificDefaultWriter(SimpleEntityAvro._SCHEMA); // Schema comes from pre-compiled, code-gen phase
+                var writer = new SpecificDefaultWriter(InheritedEntityAvro._SCHEMA); // Schema comes from pre-compiled, code-gen phase
                 writer.Write(thisObj, enc);
 
                 return ms.ToArray();
             }
         }
 
-        public SimpleEntityAvro DeserializeAvro(byte[] bytes)
+        public InheritedEntityAvro DeserializeAvro(byte[] bytes)
         {
             using (var ms = new MemoryStream(bytes))
             {
                 var dec = new BinaryDecoder(ms);
-                var reader = new SpecificDefaultReader(SimpleEntityAvro._SCHEMA, SimpleEntityAvro._SCHEMA);
-                var regenAvroMsg = new SimpleEntityAvro();
+                var reader = new SpecificDefaultReader(InheritedEntityAvro._SCHEMA, InheritedEntityAvro._SCHEMA);
+                var regenAvroMsg = new InheritedEntityAvro();
                 reader.Read(regenAvroMsg, dec);
 
                 return regenAvroMsg;

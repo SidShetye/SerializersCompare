@@ -47,6 +47,7 @@ namespace SerializersCompare
                         break;
                     case 'X':
                         //var expt = new Experiments.ThriftClientServerExpt();
+                        //var expt = new Experiments.AvroExpt();
                         var expt = new Experiments.Asn1Experiments();
                         expt.RunExpt1();
                         break;

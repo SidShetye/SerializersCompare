@@ -15,7 +15,8 @@ namespace SerializersCompare.Serializers
 	
 	public partial class InheritedEntityAvro : ISpecificRecord
 	{
-		public static Schema _SCHEMA = Avro.Schema.Parse(@"{""type"":""record"",""name"":""InheritedEntityAvro"",""namespace"":""SerializersCompare.Serializers"",""fields"":[{""name"":""Message"",""type"":""string""},{""name"":""FunctionCall"",""type"":""string""},{""name"":""Parameters"",""type"":""string""},{""name"":""Name"",""type"":""string""},{""name"":""EmployeeId"",""type"":""int""},{""name"":""RaiseRate"",""type"":""float""},{""name"":""AddressLine1"",""type"":""string""},{""name"":""AddressLine2"",""type"":""string""},{""name"":""Icon"",""type"":""bytes""},{""name"":""LargeIcon"",""type"":""bytes""}]}");
+		public static Schema _SCHEMA = Avro.Schema.Parse(@"{""type"":""record"",""name"":""InheritedEntityAvro"",""namespace"":""SerializersCompare.Serializers"",""fields"":[{""name"":""LargeIcon"",""type"":""bytes""},{""name"":""Message"",""type"":""string""},{""name"":""FunctionCall"",""type"":""string""},{""name"":""Parameters"",""type"":""string""},{""name"":""Name"",""type"":""string""},{""name"":""EmployeeId"",""type"":""int""},{""name"":""RaiseRate"",""type"":""float""},{""name"":""AddressLine1"",""type"":""string""},{""name"":""AddressLine2"",""type"":""string""},{""name"":""Icon"",""type"":""bytes""}]}");
+		private byte[] _LargeIcon;
 		private string _Message;
 		private string _FunctionCall;
 		private string _Parameters;
@@ -25,12 +26,22 @@ namespace SerializersCompare.Serializers
 		private string _AddressLine1;
 		private string _AddressLine2;
 		private byte[] _Icon;
-		private byte[] _LargeIcon;
 		public virtual Schema Schema
 		{
 			get
 			{
 				return InheritedEntityAvro._SCHEMA;
+			}
+		}
+		public byte[] LargeIcon
+		{
+			get
+			{
+				return this._LargeIcon;
+			}
+			set
+			{
+				this._LargeIcon = value;
 			}
 		}
 		public string Message
@@ -132,31 +143,20 @@ namespace SerializersCompare.Serializers
 				this._Icon = value;
 			}
 		}
-		public byte[] LargeIcon
-		{
-			get
-			{
-				return this._LargeIcon;
-			}
-			set
-			{
-				this._LargeIcon = value;
-			}
-		}
 		public virtual object Get(int fieldPos)
 		{
 			switch (fieldPos)
 			{
-			case 0: return this.Message;
-			case 1: return this.FunctionCall;
-			case 2: return this.Parameters;
-			case 3: return this.Name;
-			case 4: return this.EmployeeId;
-			case 5: return this.RaiseRate;
-			case 6: return this.AddressLine1;
-			case 7: return this.AddressLine2;
-			case 8: return this.Icon;
-			case 9: return this.LargeIcon;
+			case 0: return this.LargeIcon;
+			case 1: return this.Message;
+			case 2: return this.FunctionCall;
+			case 3: return this.Parameters;
+			case 4: return this.Name;
+			case 5: return this.EmployeeId;
+			case 6: return this.RaiseRate;
+			case 7: return this.AddressLine1;
+			case 8: return this.AddressLine2;
+			case 9: return this.Icon;
 			default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
 			};
 		}
@@ -164,16 +164,16 @@ namespace SerializersCompare.Serializers
 		{
 			switch (fieldPos)
 			{
-			case 0: this.Message = (System.String)fieldValue; break;
-			case 1: this.FunctionCall = (System.String)fieldValue; break;
-			case 2: this.Parameters = (System.String)fieldValue; break;
-			case 3: this.Name = (System.String)fieldValue; break;
-			case 4: this.EmployeeId = (System.Int32)fieldValue; break;
-			case 5: this.RaiseRate = (System.Single)fieldValue; break;
-			case 6: this.AddressLine1 = (System.String)fieldValue; break;
-			case 7: this.AddressLine2 = (System.String)fieldValue; break;
-			case 8: this.Icon = (System.Byte[])fieldValue; break;
-			case 9: this.LargeIcon = (System.Byte[])fieldValue; break;
+			case 0: this.LargeIcon = (System.Byte[])fieldValue; break;
+			case 1: this.Message = (System.String)fieldValue; break;
+			case 2: this.FunctionCall = (System.String)fieldValue; break;
+			case 3: this.Parameters = (System.String)fieldValue; break;
+			case 4: this.Name = (System.String)fieldValue; break;
+			case 5: this.EmployeeId = (System.Int32)fieldValue; break;
+			case 6: this.RaiseRate = (System.Single)fieldValue; break;
+			case 7: this.AddressLine1 = (System.String)fieldValue; break;
+			case 8: this.AddressLine2 = (System.String)fieldValue; break;
+			case 9: this.Icon = (System.Byte[])fieldValue; break;
 			default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");
 			};
 		}

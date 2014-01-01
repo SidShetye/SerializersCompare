@@ -1,5 +1,6 @@
 @echo off
 echo Running Avro code generation tool ...
+REM ..\lib\avro-1.7.5\codegen\Release\avrogen.exe -s Serializers\Avro\InheritedEntityAvroWithNulls.avsc ..
 ..\lib\avro-1.7.5\codegen\Release\avrogen.exe -s Serializers\Avro\InheritedEntityAvro.avsc ..
 ..\lib\avro-1.7.5\codegen\Release\avrogen.exe -s Serializers\Avro\SimpleEntityAvro.avsc ..
 move Serializers\InheritedEntityAvro.cs Serializers\Avro

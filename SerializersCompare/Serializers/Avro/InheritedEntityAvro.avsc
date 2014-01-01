@@ -2,6 +2,7 @@
  "name": "InheritedEntityAvro",
  "type": "record",
  "fields": [
+     {"name": "LargeIcon", "type": "bytes"},
      {"name": "Message", "type": "string"},
      {"name": "FunctionCall", "type": "string"},
      {"name": "Parameters", "type": "string"},
@@ -10,7 +11,6 @@
      {"name": "RaiseRate", "type": "float"},
      {"name": "AddressLine1", "type": "string"},
      {"name": "AddressLine2", "type": "string"},
-     {"name": "Icon", "type": "bytes"},
-     {"name": "LargeIcon", "type": "bytes"}
+     {"name": "Icon", "type": "bytes"}
  ]
 }
